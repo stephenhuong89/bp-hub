@@ -90,7 +90,7 @@
       '<div class="pbgrid">' + col("ask", "Ask for", p.ask) + col("chk2", "Check", p.check) + col("chase", "Chase", p.chase) + "</div>" +
       '<div class="row"><button type="button" class="btn ghost sm" data-go="-1"' + (stage === 0 ? " disabled" : "") + '>Previous stage</button><button type="button" class="btn sm" data-go="1"' + (stage === D.playbook.length - 1 ? " disabled" : "") + ">Next stage</button></div>";
   }
-  if (pb) {
+  if (pb && !(window.BPCASES && window.BPCASES.length)) {
     pb.addEventListener("click", function (e) { var b = e.target.closest(".stp"), g = e.target.closest("[data-go]"); if (b) stage = +b.dataset.i; else if (g) stage = Math.max(0, Math.min(D.playbook.length - 1, stage + +g.dataset.go)); else return; playbook(); });
     playbook();
   }

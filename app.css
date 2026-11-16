@@ -316,3 +316,21 @@ details.more { border: 1px solid var(--line); border-radius: var(--r); backgroun
 .pbgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-block: 14px; } .pbcol { background: var(--sheet); border: 1px solid var(--line); border-top: 5px solid; border-radius: var(--r); padding: 14px; min-width: 0; }
 .pbcol.ask { border-top-color: var(--accent); } .pbcol.chk2 { border-top-color: var(--ok); } .pbcol.chase { border-top-color: var(--warn); } .pbcol h3 { display: flex; justify-content: space-between; margin-bottom: 8px; } .pbcol h3 small { font-family: var(--f-mono); color: var(--ink-3); } .pbcol ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: .92rem; }
 #playbook { display: flex; flex-direction: column; }
+
+/* case studies */
+.road .rd { fill: none; stroke: var(--line); stroke-width: 20; stroke-linecap: round; } .road .rdl { fill: none; stroke: var(--sheet); stroke-width: 2; stroke-dasharray: 10 9; }
+.stn { cursor: pointer; } .stn circle { fill: var(--sheet); stroke: var(--ink-3); stroke-width: 3; } .stn .sn { font-family: var(--f-mono); font-size: 16px; font-weight: 600; text-anchor: middle; fill: var(--ink); }
+.stn .sl { font-family: var(--f-body); font-size: 11px; text-anchor: middle; fill: var(--ink-3); } .stn .sl.b { font-size: 12px; font-weight: 600; fill: var(--ink-2); }
+.stn.done circle { stroke: var(--ok); } .stn.on circle { fill: #d3141b; stroke: #d3141b; } .stn.on .sn { fill: #fff; } .stn.on .sl.b { fill: var(--ink); } .stn:focus { outline: none; } .stn:focus-visible circle { stroke-width: 6; }
+.case { background: var(--sheet); border: 1px solid var(--line); border-top: 6px solid #d3141b; border-radius: var(--r); padding: 20px; display: flex; flex-direction: column; gap: 16px; margin-block: 8px 20px; min-width: 0; }
+.case header { display: flex; flex-direction: column; gap: 4px; } .case h2 { font-size: clamp(1.5rem, 3.4vw, 2.3rem); max-width: 26ch; }
+.frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; } .frame { margin: 0; border: 2px solid var(--ink); border-radius: var(--r); padding: 10px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.frame .fno { font-family: var(--f-mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); } .frame figcaption { font-size: .95rem; font-weight: 500; line-height: 1.35; } .frame .pic { height: 120px; }
+.pic .pp { fill: var(--sheet); stroke: var(--ink); stroke-width: 2.5; } .pic .pl { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; } .pic .pd circle { fill: var(--ink); }
+.pic .pb { fill: none; stroke: var(--bad); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; } .pic .pbf { fill: var(--bad); stroke: none; } .pic .pbd { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 2.5; stroke-dasharray: 6 4; } .pic .pok { fill: none; stroke: var(--ok); stroke-width: 3.5; stroke-linecap: round; }
+.pic .pt { font-family: var(--f-mono); font-size: 9.5px; text-anchor: middle; fill: var(--ink-2); } .pic .pt.b { fill: var(--bad); font-weight: 600; } .pic .pt.xl { font-family: var(--f-head); font-size: 34px; font-weight: 700; fill: var(--bad); }
+.costs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; } .cost { border-left: 5px solid var(--bad); padding: 4px 0 4px 12px; display: flex; flex-direction: column; min-width: 0; }
+.cost b { font-family: var(--f-head); font-size: clamp(1.7rem, 3.6vw, 2.5rem); line-height: 1.05; color: var(--bad); } .cost span { font-size: .86rem; color: var(--ink-2); }
+.lesson blockquote { font-size: clamp(1.15rem, 2.4vw, 1.5rem); } .lesson { max-width: 60ch; }
+.also { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 6px; } .alsoc { border: 1px dashed var(--line); border-radius: var(--r); padding: 10px 12px; text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.alsoc:hover { border-color: var(--bad); } .alsoc b { font-family: var(--f-head); font-size: 1.4rem; color: var(--bad); } .alsoc span { font-size: .84rem; color: var(--ink-2); }
