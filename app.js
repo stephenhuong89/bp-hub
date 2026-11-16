@@ -131,8 +131,8 @@
     var box = $("#ai-off"), viaPass = !!pass(), has = viaPass || !!apiKey();
     if (sample) { box.hidden = true; return; }
     box.hidden = false; box.className = "keybox";
-    box.innerHTML = viaPass ? '<b>Claude is connected with the CVC staff passcode.</b><span>Drawings you check go through the CVC relay to Anthropic. You do not need a key.</span><button type="button" class="btn ghost sm" id="key-clear">Disconnect</button>' : has
-      ? '<b>Claude is connected with an API key saved in this browser.</b><span>Drawings you check go from this browser straight to Anthropic under that key.</span><button type="button" class="btn ghost sm" id="key-clear">Remove the key</button>'
+    box.innerHTML = viaPass ? '<b>Claude is connected with the CVC staff passcode.</b><span>Drawings you check go through the CVC relay to Anthropic. You do not need a key.</span><div class="row"><button type="button" class="btn sm" id="conn-test">Test the connection</button><button type="button" class="btn ghost sm" id="key-clear">Disconnect</button><span class="small" id="conn-msg" role="status"></span></div>' : has
+      ? '<b>Claude is connected with an API key saved in this browser.</b><span>Drawings you check go from this browser straight to Anthropic under that key.</span><div class="row"><button type="button" class="btn sm" id="conn-test">Test the connection</button><button type="button" class="btn ghost sm" id="key-clear">Remove the key</button><span class="small" id="conn-msg" role="status"></span></div>'
       : '<b>Connect Claude to check drawings on this site</b><span>CVC staff: type the staff passcode. It is saved only in this browser.</span><div class="row"><input type="password" id="pass-in" placeholder="Staff passcode" autocomplete="off" aria-label="Staff passcode"><button type="button" class="btn sm" id="pass-save">Connect</button><span class="small" id="pass-msg" role="status"></span></div>' +
         '<details><summary class="small">Use your own Anthropic API key instead</summary><span>The key is saved only in this browser and sent only to api.anthropic.com. Each check is billed to that key.</span><div class="row"><input type="password" id="key-in" placeholder="sk-ant-..." autocomplete="off" aria-label="Anthropic API key"><button type="button" class="btn ghost sm" id="key-save">Connect with key</button></div></details>';
     aiReady = has; maxImages = 7; $("#ask-btn").hidden = !has; renderThumbs();
@@ -140,6 +140,11 @@
   document.addEventListener("click", function (e) {
     if (e.target.id === "key-save") { var v = ($("#key-in").value || "").trim(); if (v) { try { localStorage.setItem(KEYNAME, v); } catch (x) {} renderKeyBox(); } }
     if (e.target.id === "key-clear") { try { localStorage.removeItem(KEYNAME); localStorage.removeItem(PASSNAME); } catch (x) {} renderKeyBox(); }
+    if (e.target.id === "conn-test") {
+      var cm = $("#conn-msg"), cb = e.target; cm.textContent = "Asking Claude for a one-word reply..."; cb.disabled = true;
+      apiCall("Reply with the single word OK.", null, "default").then(function () { cm.textContent = "Working. Claude answered, so drawing checks will run."; cm.style.color = "var(--ok)"; },
+        function (er) { cm.textContent = "Not working: " + ((er && er.message) || errCopy(er)); cm.style.color = "var(--bad)"; }).then(function () { cb.disabled = false; });
+    }
     if (e.target.id === "pass-save") {
       var pv = ($("#pass-in").value || "").trim(), pm = $("#pass-msg"); if (!pv) return;
       pm.textContent = "Checking..."; e.target.disabled = true;
