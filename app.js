@@ -485,8 +485,10 @@
     f.forEach(function (x) { if (n[x.status] != null) n[x.status]++; });
     var order = { non_comply: 0, unclear: 1, comply: 2 };
     var sorted = f.slice().sort(function (a, b) { return (order[a.status] || 0) - (order[b.status] || 0); });
+    var cta = '<div class="repcta pr-off"><div><b>Keep this report</b><span>It is stored in this browser only. Save the PDF to your computer or email it now.</span></div><button type="button" class="btn rep-pdf">Save as PDF</button><button type="button" class="btn rep-mail">Email report</button></div>';
     var o = rep.outlook || {}, html = '<div class="view">' +
-      '<div class="view-head"><h2>Review result</h2><div class="row pr-off"><button type="button" class="btn" id="rep-pdf">Save as PDF</button><span class="small">Saved in this browser too: reopen it under Saved reviews below.</span></div><p class="small">' + esc((rv.facts.name || "Untitled project") + " · " + rv.sheets.length + " sheet(s) · " + new Date(rv.at).toLocaleString("en-SG")) + "</p></div>" +
+      '<div class="repbrand"><img src="logo.png" alt="CVC Engineers Pte Ltd" width="64" height="64"><div><b>CVC Engineers Pte Ltd</b><span>' + (window.BPMODE === "st" ? "Structural plan (ST)" : "Building plan (BP)") + ' drawing review</span></div></div>' + cta +
+      '<div class="view-head"><h2>Review result</h2><p class="small">' + esc((rv.facts.name || "Untitled project") + " · " + rv.sheets.length + " sheet(s) · " + new Date(rv.at).toLocaleString("en-SG")) + "</p></div>" +
       '<div class="note">This is a first-pass screen by an AI reading the sheets you selected. It can misread a dimension or miss one. A finding is not an authority decision and does not replace the QP\'s own check.</div>' +
       '<div class="kpis"><div class="kpi"><b style="color:var(--bad)">' + n.non_comply + '</b><span class="small">Not comply</span></div><div class="kpi"><b style="color:var(--warn)">' + n.unclear + '</b><span class="small">Cannot tell</span></div><div class="kpi"><b style="color:var(--ok)">' + n.comply + '</b><span class="small">Comply</span></div></div>' +
       '<div class="panel"><p>' + esc(rep.summary || "") + '</p><div class="grid">' +
@@ -504,8 +506,9 @@
     if ((rep.questions_for_architect || []).length) html += '<h3>' + mt("Send to the architect") + '</h3><div class="panel">' + list(rep.questions_for_architect) + '<div class="row"><button type="button" class="btn ghost sm" id="copy-q">Copy as text</button></div></div>';
     var obs = []; (rv.perSheet || []).forEach(function (s) { (s.other_observations || []).forEach(function (t) { obs.push(s.name + ": " + t); }); (s.missing_on_sheet || []).forEach(function (t) { obs.push(s.name + ": missing " + t); }); if (s.error) obs.push(s.name + ": not reviewed. " + s.error); });
     if (obs.length) html += '<h3>Other observations per sheet</h3><div class="panel">' + list(obs) + "</div>";
-    $("#report").innerHTML = html + "</div>";
-    var pb = $("#rep-pdf"); if (pb) pb.onclick = printReport;
+    $("#report").innerHTML = html + cta + '<p class="small repfoot">Prepared with the CVC ' + (window.BPMODE === "st" ? "ST" : "BP") + ' Submission Hub. First-pass AI screen of the sheets listed; not an authority decision and not a substitute for the qualified person\'s own check.</p></div>';
+    $$(".rep-pdf", $("#report")).forEach(function (b) { b.onclick = printReport; });
+    $$(".rep-mail", $("#report")).forEach(function (b) { b.onclick = function () { mailReport(rv, n, sorted); }; });
     var cq = $("#copy-q"); if (cq) cq.onclick = function () {
       var txt = rep.questions_for_architect.map(function (q, i) { return (i + 1) + ". " + q; }).join("\n");
       navigator.clipboard.writeText(txt).then(function () { cq.textContent = "Copied"; }).catch(function () { cq.textContent = "Select the list and copy it manually"; });
@@ -539,6 +542,21 @@
       return "<tr><td>" + esc((r.facts && r.facts.name) || "Untitled project") + "</td><td>" + esc(new Date(r.at).toLocaleString("en-SG")) + '</td><td class="num">' + ((r.sheets || []).length) + '</td><td class="num">' + nc + '</td><td><button type="button" class="btn ghost sm" data-open="' + i + '">Open</button></td></tr>'; }).join("") + "</tbody></table></div>" : "No saved reviews yet. A review is saved here when it finishes, so the team can reopen it.";
   }
   saved = localReviews(); if (saved.length) renderSaved();
+  function mailReport(rv, n, sorted) {
+    var rep = rv.report, o = rep.outlook || {}, tag = window.BPMODE === "st" ? "ST" : "BP", name = (rv.facts && rv.facts.name) || "Drawing set", L = [];
+    var cut = function (s, k) { s = String(s || "").replace(/\s+/g, " "); return s.length > k ? s.slice(0, k - 1) + "\u2026" : s; };
+    L.push(name + " - " + tag + " drawing review, " + new Date(rv.at).toLocaleDateString("en-SG"));
+    L.push(rv.sheets.length + " sheet(s) reviewed. Not comply: " + n.non_comply + ". Cannot tell: " + n.unclear + ". Comply: " + n.comply + ".");
+    if (o.bp && o.bp.band) L.push("Plan approval outlook: " + o.bp.band + "."); if (o.top_csc && o.top_csc.band) L.push("TOP / CSC outlook: " + o.top_csc.band + ".");
+    if (rep.summary) L.push("", cut(rep.summary, 420));
+    var bad = sorted.filter(function (x) { return x.status === "non_comply"; });
+    if (bad.length) { L.push("", "Not comply:"); bad.slice(0, 6).forEach(function (x) { var r = RULE[x.rule_id]; L.push("- " + cut(r ? r.title : x.rule_id, 70) + (x.value_found ? " (read: " + cut(x.value_found, 40) + ")" : "")); }); if (bad.length > 6) L.push("- and " + (bad.length - 6) + " more in the PDF"); }
+    L.push("", "The full report is in the attached PDF.", "", "CVC Engineers Pte Ltd", "First-pass AI screen. Not an authority decision.");
+    var body = L.join("\r\n"); if (body.length > 1700) body = body.slice(0, 1700) + "\u2026";
+    var note = $("#mail-note"); if (!note) { note = document.createElement("p"); note.id = "mail-note"; note.className = "note pr-off"; $("#report .repcta").insertAdjacentElement("afterend", note); }
+    note.textContent = "An email draft is opening with the summary. A web page cannot attach files, so press Save as PDF first and attach that PDF to the draft before sending.";
+    location.href = "mailto:?subject=" + encodeURIComponent(name + " - " + tag + " drawing review") + "&body=" + encodeURIComponent(body);
+  }
   function printReport() {
     var hid = [], el = $("#report"), old = document.title;
     for (var n = el; n && n !== document.body; n = n.parentNode) Array.prototype.forEach.call(n.parentNode.children, function (c) { if (c !== n && c.tagName !== "SCRIPT" && c.tagName !== "STYLE") { c.classList.add("pr-hide"); hid.push(c); } });

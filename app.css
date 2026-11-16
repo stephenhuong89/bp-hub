@@ -503,3 +503,12 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
   html.print-report .badge, html.print-report .kpi b, html.print-report .finding { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 @page { margin: 14mm; }
+
+/* Report letterhead and the keep-this-report bar */
+.repbrand { display: flex; align-items: center; gap: 14px; border-bottom: 4px solid var(--bad); padding-bottom: 12px; margin-bottom: 14px; } .repbrand img { width: 64px; height: 64px; object-fit: contain; }
+.repbrand div { display: flex; flex-direction: column; } .repbrand b { font: 700 1.7rem/1 var(--f-head); text-transform: uppercase; } .repbrand span { font-size: .95rem; color: var(--ink-2); }
+.repcta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; background: var(--ink); color: #fff; padding: 18px 20px; margin: 14px 0; border-left: 10px solid var(--bad); }
+.repcta > div { flex: 1 1 280px; display: flex; flex-direction: column; gap: 2px; } .repcta b { font: 700 1.5rem/1.05 var(--f-head); text-transform: uppercase; } .repcta span { color: #D5DADE; font-size: .95rem; }
+.repcta .btn { font-size: 1.1rem; padding: 14px 24px; } .repcta .rep-mail { background: #fff; color: var(--ink); border-color: #fff; }
+.repfoot { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 10px; }
+@media print { html.print-report .repbrand { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
