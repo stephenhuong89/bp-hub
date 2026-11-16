@@ -5,10 +5,13 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", TAG = window.BPTAG || "BP";
-  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
-  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)" }[window.BPMODE || "bp"];
+  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", TAG = window.BPTAG || "BP";
+  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
+  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)" }[window.BPMODE || "bp"];
   function mt(s) {
+    if (FIRE) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "SCDF fire safety submissions").replace(/building plan \(BP\)/g, "SCDF fire safety plan")
+      .replace(/building plan drawing set/g, "fire safety plan drawing set").replace(/BP\/plan approval/g, "SCDF fire safety plan approval").replace(/TOP\/CSC/g, "the Fire Safety Certificate")
+      .replace(/a BP submission needs/g, "a fire safety plan submission needs").replace(/standard BP sheet contents/g, "standard fire safety plan contents").replace(/\bBP\b/g, "SCDF");
     if (URA) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "URA planning permission (development control) submissions").replace(/building plan \(BP\)/g, "URA planning permission")
       .replace(/building plan drawing set/g, "planning permission drawing set").replace(/BP\/plan approval/g, "URA written permission").replace(/TOP\/CSC/g, "the later BCA building plan stage")
       .replace(/a BP submission needs/g, "a URA development application needs").replace(/standard BP sheet contents/g, "standard planning submission contents").replace(/\bBP\b/g, "URA");

@@ -3,13 +3,14 @@
 (function () {
   "use strict";
   var saved = null; try { saved = localStorage.getItem("bp.mode"); } catch (e) {}
-  var SETS = { st: "ST", ura: "URA" };
+  var SETS = { st: "ST", ura: "URA", scdf: "SCDF" };
   var modes = ["bp"].concat(Object.keys(SETS).filter(function (m) { return !!window[SETS[m] + "DATA"]; }));
   var mode = modes.indexOf(saved) >= 0 ? saved : "bp";
   var NAMES = {
     bp: ["BP", "Building plan submission", "Architectural plans: fire escape, safety, accessibility, planning. For the team managing the architect."],
     st: ["ST", "Structural plan submission", "Structural plans, calculations, the accredited checker, piling, excavation and supervision. CVC's own submissions."],
-    ura: ["URA", "Planning permission", "Use, plot ratio, height and setbacks under the Planning Act. The first approval, before any building plan."]
+    ura: ["URA", "Planning permission", "Use, plot ratio, height and setbacks under the Planning Act. The first approval, before any building plan."],
+    scdf: ["SCDF", "Fire safety submission", "Fire safety plans, minor A&A lodgment, the Registered Inspector and the Fire Safety Certificate."]
   };
   window.BPMODE = mode; window.BPTAG = NAMES[mode][0]; document.documentElement.setAttribute("data-mode", mode);
   if (mode !== "bp") {
@@ -59,7 +60,21 @@
       ["#v-playbook .view-head h2", "Managing a planning application, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
     ]
   };
-  var PLACE = { st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
+  TXT.scdf = [
+    ['#nav a[href="#story"]', "Why SCDF"], ['#nav a[href="#who"]', "Which route"], ['#nav a[href="#playbook"]', "Managing the submission"],
+    ["#v-story .hero .label", "Why fire safety approval exists"], ["#v-story .hero h1", "Everyone out. Then the firefighters in."], ["#v-story .hero .lead", "A fire safety plan answers two questions: can every person reach a safe place in time, and can the fire engine and its crew reach the fire."],
+    ["#v-story > .grid .navcard:nth-child(1) b", "Learn the numbers"], ["#v-story > .grid .navcard:nth-child(1) span", "Travel distance and exit testers"], ["#v-story > .grid .navcard:nth-child(2) b", "Which route"], ["#v-story > .grid .navcard:nth-child(2) span", "Plan approval, minor A&A or waiver"], ["#v-story > .grid .navcard:nth-child(4) span", "AI screen of a fire safety plan"],
+    ["#v-guide .view-head h2", "Learn to read a floor plan the way SCDF does"], ["#v-guide .view-head .lead", "Travel distance, exit width and what height triggers, each with a calculator."], ["#v-guide > h3", "Twelve numbers every fire safety plan turns on"],
+    ["#v-guide > .grid .navcard:nth-child(1) b", "Which route"], ["#v-guide > .grid .navcard:nth-child(1) span", "By type of works"], ["#v-guide > .grid .navcard:nth-child(4) span", "Upload a fire safety plan for an AI screen"],
+    ["#v-mistakes .view-head h2", "Why fire safety submissions stall"], ["#v-mistakes .view-head .lead", "Where fire safety plans, site works and certificates go wrong, from SCDF's pages and from enforcement. Pick a stage."],
+    ["#v-search .view-head h2", "Search Singapore fire safety submission rules"],
+    ["#v-who .view-head h2", "Which route: plan approval, minor A&A lodgment or waiver"], ["#v-who .view-head .lead", "Which fire safety works need SCDF's approval first, which can be lodged, and who must sign."],
+    ["#v-process .view-head h2", "From fire safety plan to Fire Safety Certificate"], ["#v-process .view-head .lead", "The fire safety sequence: who acts, what goes in, what comes back, how long SCDF takes, and what usually stalls it."],
+    ["#v-fees .view-head .lead", "SCDF's plan fees computed from the published schedule. The Registered Inspector, the fire safety engineer and testing are commercial costs outside this estimate."],
+    ["#v-check .view-head .lead", "Upload the fire safety plans. Each sheet is read against the Fire Code rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen."], ["#drop b", "Drop the fire safety plans here"],
+    ["#v-playbook .view-head h2", "Managing a fire safety submission, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
+  ];
+  var PLACE = { scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
   if (TXT[mode]) {
     TXT[mode].forEach(function (t) { var el = document.querySelector(t[0]); if (el) el.textContent = t[1]; });
     var qi = document.querySelector("#q"); if (qi) qi.placeholder = PLACE[mode];

@@ -522,3 +522,8 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 .chgrid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); } .chtile b { font-size: clamp(3.6rem, 9vw, 6.5rem); }
 .modesw button { padding: 8px 9px; font-size: .98rem; }
 .plot { fill: #EFE7DA; stroke: var(--ink); stroke-width: 2; } .dwg .bldg { fill: var(--line-2); stroke: var(--ink); stroke-width: 2; } .dwg .bldg.bad { fill: #F4C9CB; stroke: var(--bad); } .dwg .setb { fill: none; stroke: var(--bad); stroke-width: 2; stroke-dasharray: 6 5; } .dwg .road { fill: #C9CED2; }
+
+/* SCDF mode */
+[data-mode="scdf"] .bp-only, [data-mode="scdf"] .st-only, [data-mode="scdf"] .ura-only, html:not([data-mode="scdf"]) .scdf-only { display: none !important; }
+.modesw button { padding: 8px 7px; font-size: .92rem; }
+.dwg .fire { fill: var(--bad); } .dwg .exitp { fill: none; stroke: var(--ok); stroke-width: 3; } .dwg .exitp.bad { stroke: var(--bad); }
