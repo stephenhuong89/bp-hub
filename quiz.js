@@ -6,7 +6,7 @@
   var RULE = {}; D.entries.forEach(function (e) { RULE[e.id] = e; });
   function ref(id) { var r = RULE["rule-" + id]; return r ? r.ref.replace(/ \(read from.*$/, "") : id; }
   /* [topic, question, correct answer, wrong answers, why, source] */
-  var Q = [
+  var Q = window.BPQUIZ ? window.BPQUIZ.slice() : [
     ["Numbers", "What is the tallest a stair riser may be?", "175 mm", ["150 mm", "190 mm", "200 mm"], "Every riser, and all the same height.", ref("AD-06")],
     ["Numbers", "The shallowest tread allowed on a common staircase?", "275 mm", ["225 mm", "250 mm", "300 mm"], "225 mm applies only inside a residential unit and 250 mm in an industrial building.", ref("AD-07")],
     ["Numbers", "A balcony has a 3 m drop. The lowest barrier allowed?", "1.0 m", ["0.9 m", "1.1 m", "1.2 m"], "A barrier is needed once the drop is 1.0 m or more, and it must be at least 1.0 m high.", ref("AD-22")],
@@ -39,10 +39,10 @@
     ["Real cases", "After the Toh Guan Road fire, what had been wrong with the cladding?", "It was sold after its fire certification was cancelled", ["It was installed upside down", "It was too heavy", "It had no drainage"], "SCDF traced the same stock to 40 buildings.", "SCDF release, 24 Aug 2017"]
   ];
   var PICKS = [["travel", "Which drawing measures travel distance correctly?"], ["exits", "Which floor has its two exits placed correctly?"], ["barrier", "Which barrier complies?"], ["stair", "Which staircase complies?"], ["ramp", "Which ramp complies?"], ["door", "Which door is wide enough for an accessible route?"], ["head", "Which section has enough headroom?"], ["setback", "Which building respects the setback?"]];
-  PICKS.forEach(function (p) { var e = EX[p[0]]; if (e) Q.push(["Spot the right drawing", p[1], "__pic", [], e[2], ref(e[0]), e]); });
+  if (!window.BPQUIZ) PICKS.forEach(function (p) { var e = EX[p[0]]; if (e) Q.push(["Spot the right drawing", p[1], "__pic", [], e[2], ref(e[0]), e]); });
 
   function neutral(s) { return s.replace(/var\(--(ok|bad)\)/g, "var(--ink)").replace(/var\(--bad-soft\)/g, "transparent").replace(/<text[^>]*>(all equal|one taller|not on ST plan)<\/text>/g, ""); }
-  var TOPICS = ["Mixed", "Numbers", "Who and process", "Mistakes", "Real cases", "Spot the right drawing"], topic = "Mixed", set = [], i = 0, score = 0, streak = 0, answered = false, wrong = {};
+  var TOPICS = ["Mixed"].concat(Q.map(function (x) { return x[0]; }).filter(function (t, i, a) { return a.indexOf(t) === i; })), topic = "Mixed", set = [], i = 0, score = 0, streak = 0, answered = false, wrong = {};
   function best() { try { return JSON.parse(localStorage.getItem("bp.quiz") || "{}"); } catch (e) { return {}; } }
   function shuffle(a) { a = a.slice(); for (var k = a.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)), t = a[k]; a[k] = a[j]; a[j] = t; } return a; }
   function start(t) { topic = t; var pool = t === "Mixed" ? Q : Q.filter(function (q) { return q[0] === t; }); set = shuffle(pool).slice(0, Math.min(10, pool.length)); i = 0; score = 0; streak = 0; wrong = {}; show(); }

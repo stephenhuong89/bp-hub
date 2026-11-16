@@ -7,7 +7,7 @@
   var ICON = window.BPEXOK || {};
 
   /* ---------- 1. Numbers poster ---------- */
-  var NUM = [
+  var NUM = window.BPNUM || [
     ["175", "mm", "Tallest stair riser", "stair", "AD-06", "staircase riser"],
     ["275", "mm", "Shallowest tread on a common stair", "stair", "AD-07", "tread"],
     ["1.0", "m", "Lowest barrier at a drop", "barrier", "AD-22", "barrier height"],
@@ -24,7 +24,7 @@
   var poster = $("#g-numbers");
   if (poster) {
     poster.innerHTML = NUM.map(function (n) {
-      var r = RULE["rule-" + n[4]];
+      var r = RULE["rule-" + n[4]] || { ref: n[4] };
       return '<a class="numcard" href="#search" data-q="' + esc(n[5]) + '">' + (ICON[n[3]] || "") + '<b>' + esc(n[0]) + (n[1] ? "<small>" + n[1] + "</small>" : "") + "</b><span>" + esc(n[2]) + '</span><em class="ref mono">' + esc(r ? r.ref.replace(/ \(read from.*$/, "") : "") + "</em></a>";
     }).join("");
     poster.addEventListener("click", function (e) { var a = e.target.closest(".numcard"); if (a) A.setQuery(a.dataset.q); });
@@ -55,9 +55,9 @@
   var COL = { classify: 0, appoint: 0, preconsult: 1, ura: 2, "ura-lodge": 2, dc: 2, dg: 2, pg: 3, bp: 3, st: 3, scdf: 3, cg: 4, permit: 5, build: 6, fsc: 7, top: 8, csc: 9 };
   function gantt(track) {
     var el = $("#p-gantt"); if (!el) return;
-    var steps = D.steps.filter(function (s) { return s.tracks.indexOf(track) >= 0 && s.id !== "build" && s.id !== "classify" && s.id !== "appoint"; });
+    var steps = D.steps.filter(function (s) { return s.tracks.indexOf(track) >= 0 && !s.untimed && s.id !== "build" && s.id !== "classify" && s.id !== "appoint"; });
     var stages = {}, STUB = 6;
-    steps.forEach(function (s) { var c = COL[s.id]; stages[c] = Math.max(stages[c] || 0, s.tatMax || STUB); });
+    steps.forEach(function (s) { var c = s.col != null ? s.col : COL[s.id]; stages[c] = Math.max(stages[c] || 0, s.tatMax || STUB); });
     var order = Object.keys(stages).map(Number).sort(function (a, b) { return a - b; }), start = {}, t = 0;
     order.forEach(function (c) { start[c] = t; t += stages[c]; });
     var x0 = 300, W = 900, k = (W - x0 - 80) / t, rh = 26, H = 34 + steps.length * rh + 26;
@@ -65,7 +65,7 @@
     for (var d = 0; d <= t; d += 20) s += '<line x1="' + (x0 + d * k) + '" y1="22" x2="' + (x0 + d * k) + '" y2="' + (H - 22) + '" class="grid"/><text x="' + (x0 + d * k) + '" y="14" class="t mid">' + (d ? d + " wd" : "day 0") + "</text>";
     var built = false;
     steps.forEach(function (st, i) {
-      var c = COL[st.id], y = 30 + i * rh, w = (st.tatMax || STUB) * k, x = x0 + start[c] * k;
+      var c = st.col != null ? st.col : COL[st.id], y = 30 + i * rh, w = (st.tatMax || STUB) * k, x = x0 + start[c] * k;
       if (!built && c > 5) { built = true; s += '<line x1="' + (x - 6) + '" y1="24" x2="' + (x - 6) + '" y2="' + (H - 22) + '" class="brk"/><text x="' + (x - 10) + '" y="' + (H - 6) + '" class="t" text-anchor="end">construction happens here</text>'; }
       s += '<text x="' + (x0 - 8) + '" y="' + (y + 15) + '" class="t" text-anchor="end">' + esc(st.title.replace(/ and .*$| for the .*$| \(.*$/, "").slice(0, 44)) + '</text><rect x="' + x + '" y="' + y + '" width="' + Math.max(4, w) + '" height="18" rx="4" class="gb' + (st.tatMax ? "" : " un") + '"><title>' + esc(st.title + ": " + (st.tatNote || "no published time")) + '</title></rect><text x="' + (x + Math.max(4, w) + 6) + '" y="' + (y + 14) + '" class="t">' + (st.tatMax ? st.tatMax + " wd" : "not published") + "</text>";
     });

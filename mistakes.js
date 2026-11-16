@@ -4,7 +4,7 @@
   "use strict";
   var $ = function (s, r) { return (r || document).querySelector(s); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  var A = [
+  var A = window.BPMIST || [
     { id: "bca", name: "BCA plans", by: "BCA, Understanding the Approved Document v3.0 (June 2024), site observations", src: "https://isomer-user-content.by.gov.sg/338/2f5ef8a0-f407-4728-a756-473964dcb077/understanding-the-approved-document-v3-0.pdf", items: [
       ["Headroom lost to something hung later", "Signs, slanted structures, the underside of a stair, or a window swinging into a walkway bring headroom under 2.0 m (2.2 m on a driveway).", "head"],
       ["Risers that are not all the same", "Irregular risers are a frequent finding. A stair that is not finished at inspection is treated as non-compliant.", "stair"],
@@ -53,7 +53,7 @@
       ["Old files left in the resubmission", "Superseded models and plans must be removed.", "nostamp"],
       ["Plans not digitally signed", "Every plan needs the QP's digital signature.", "nostamp"]] }
   ];
-  var cur = "bca";
+  var cur = A[0].id;
   function pic(k) { var ex = window.BPEXALL && window.BPEXALL[k]; return ex ? ex[3] : (window.BPPIC ? window.BPPIC(k) : ""); }
   function render() {
     var a = A.filter(function (x) { return x.id === cur; })[0];
