@@ -10,7 +10,7 @@
 <title>CVC BP Submission Hub</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="app.css?v=mwjeex4f">
+<link rel="stylesheet" href="app.css?v=mwjenohd">
 
 <header class="top">
   <div class="wrap">
@@ -212,10 +212,10 @@
     <div class="panel">
       <h3>1. Drop the drawings</h3>
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose drawing files">
-        <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><path d="M32 44 V14 M20 26 l12 -12 l12 12 M10 44 v8 h44 v-8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="square"/></svg><b>Drop the architect's drawings here</b><span class="dsub">PDF, PNG, JPG, or a zip of them. Or click to choose files.</span>
-        <div class="small">Files are read in your browser. Only the sheets you select are sent to Claude for review.</div>
+        <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><path d="M32 44 V14 M20 26 l12 -12 l12 12 M10 44 v8 h44 v-8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="square"/></svg><b>Drop the architect's drawings here</b><span class="dsub">PDF, DWG, PNG, JPG, or a zip of them. Or click to choose files.</span>
+        <div class="small">Files are read in your browser. Only the sheets you select are sent to Claude for review. DWG sheets are redrawn in black and white without plot styles or hatch patterns, so use the PDF where you have it.</div>
       </div>
-      <input type="file" id="file" accept="application/pdf,image/png,image/jpeg,.zip,application/zip,application/x-zip-compressed" multiple hidden>
+      <input type="file" id="file" accept="application/pdf,image/png,image/jpeg,.dwg,.dxf,.zip,application/zip,application/x-zip-compressed" multiple hidden>
       <div class="dropmsg" id="drop-msg" role="alert" hidden></div>
       <div class="row" id="thumb-bar" hidden>
         <span class="small" id="sel-count"></span>
@@ -275,26 +275,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="data.js?v=mwjeex4f"></script>
-<script src="rules.js?v=mwjeex4f"></script>
-<script src="stats.js?v=mwjeex4f"></script>
-<script src="cases.js?v=mwjeex4f"></script>
-<script src="st-data.js?v=mwjeex4f"></script>
-<script src="mode.js?v=mwjeex4f"></script>
-<script src="app.js?v=mwjeex4f"></script>
-<script src="examples.js?v=mwjeex4f"></script>
-<script src="guide.js?v=mwjeex4f"></script>
-<script src="viz.js?v=mwjeex4f"></script>
-<script src="game.js?v=mwjeex4f"></script>
-<script src="visuals.js?v=mwjeex4f"></script>
-<script src="casestudy.js?v=mwjeex4f"></script>
+<script src="data.js?v=mwjenohd"></script>
+<script src="rules.js?v=mwjenohd"></script>
+<script src="stats.js?v=mwjenohd"></script>
+<script src="cases.js?v=mwjenohd"></script>
+<script src="st-data.js?v=mwjenohd"></script>
+<script src="mode.js?v=mwjenohd"></script>
+<script src="dwg.js?v=mwjenohd"></script>
+<script src="app.js?v=mwjenohd"></script>
+<script src="examples.js?v=mwjenohd"></script>
+<script src="guide.js?v=mwjenohd"></script>
+<script src="viz.js?v=mwjenohd"></script>
+<script src="game.js?v=mwjenohd"></script>
+<script src="visuals.js?v=mwjenohd"></script>
+<script src="casestudy.js?v=mwjenohd"></script>
 <script src="https://cdn.jsdelivr.net/npm/motion@10.18.0/dist/motion.min.js"></script>
-<script src="mistakes.js?v=mwjeex4f"></script>
-<script src="quiz.js?v=mwjeex4f"></script>
-<script src="motion.js?v=mwjeex4f"></script>
-<script src="whatif.js?v=mwjeex4f"></script>
-<script src="story.js?v=mwjeex4f"></script>
-<script src="st-learn.js?v=mwjeex4f"></script>
+<script src="mistakes.js?v=mwjenohd"></script>
+<script src="quiz.js?v=mwjenohd"></script>
+<script src="motion.js?v=mwjenohd"></script>
+<script src="whatif.js?v=mwjenohd"></script>
+<script src="story.js?v=mwjenohd"></script>
+<script src="st-learn.js?v=mwjenohd"></script>
 <!--ARTIFACT-BODY-END-->
 </body>
 </html>

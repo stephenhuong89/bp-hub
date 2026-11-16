@@ -286,11 +286,11 @@
   function dropMsg(skipped, added) {
     var el = $("#drop-msg"); if (!el) return;
     if (!skipped || !skipped.length) { el.hidden = true; el.textContent = ""; return; }
-    var by = {}, cad = false;
-    skipped.forEach(function (n) { var m = /\.([a-z0-9]+)$/i.exec(n), x = m ? m[1].toUpperCase() : "other"; by[x] = (by[x] || 0) + 1; if (/^(DWG|DXF|DGN|RVT|IFC|SKP)$/.test(x)) cad = true; });
+    var by = {}, cad = false, dwg = false;
+    skipped.forEach(function (n) { var m = /\.([a-z0-9]+)$/i.exec(n), x = m ? m[1].toUpperCase() : "other"; by[x] = (by[x] || 0) + 1; if (/^(DGN|RVT|IFC|SKP)$/.test(x)) cad = true; if (/^(DWG|DXF)$/.test(x)) dwg = true; });
     var parts = Object.keys(by).sort(function (p, q) { return by[q] - by[p]; }).map(function (x) { return by[x] + " " + x; });
-    el.textContent = (added ? "" : "No sheets were loaded. ") + skipped.length + (skipped.length === 1 ? " file" : " files") + " could not be read (" + parts.join(", ") + "). The checker reads PDF, PNG and JPG, and opens zip files to find them." +
-      (cad ? " Plot the CAD files to PDF first, or ask for the PDF set." : "");
+    el.textContent = (added ? "" : "No sheets were loaded. ") + skipped.length + (skipped.length === 1 ? " file" : " files") + " could not be read (" + parts.join(", ") + "). The checker reads PDF, DWG, DXF, PNG and JPG, and opens zip files to find them." +
+      (dwg ? " A DWG that fails is usually damaged or saved in a format this reader does not know; plot it to PDF." : "") + (cad ? " Plot the other CAD files to PDF first, or ask for the PDF set." : "");
     el.hidden = false;
     if (!added && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" });
   }
@@ -327,16 +327,25 @@
             renderThumbs();
           }).catch(function () { log("Could not read image " + file.name); });
         }
+        if (/\.(dwg|dxf)$/i.test(file.name)) {
+          if (!window.BPDWG) { skipped.push(file.name); return; }
+          return window.BPDWG.read(file).then(function (list) {
+            list.forEach(function (s) {
+              sheets.push({ id: s.name, name: s.name, thumb: s.thumb.toDataURL("image/jpeg", 0.7), selected: true, text: s.text, getCanvas: function () { return Promise.resolve(s.draw(4000)); } });
+            });
+            renderThumbs();
+          }).catch(function (e) { log("Could not read " + file.name + ": " + (e && e.message || e)); skipped.push(file.name); });
+        }
         if (/\.zip$/i.test(file.name) || /zip/i.test(file.type)) {
           if (!window.JSZip) { skipped.push(file.name); return; }
           return file.arrayBuffer().then(function (buf) { return window.JSZip.loadAsync(buf); }).then(function (z) {
             var inner = [], p = Promise.resolve();
             z.forEach(function (path, ent) {
               if (ent.dir || /(^|\/)(__MACOSX\/|\._|\.DS_Store|Thumbs\.db)/.test(path)) return;
-              var nm = path.split("/").pop(), m = /\.(pdf|png|jpe?g|zip)$/i.exec(nm);
+              var nm = path.split("/").pop(), m = /\.(pdf|png|jpe?g|zip|dwg|dxf)$/i.exec(nm);
               if (!m) { skipped.push(nm); return; }
               p = p.then(function () { return ent.async("blob"); }).then(function (b) {
-                var x = m[1].toLowerCase(), type = x === "pdf" ? "application/pdf" : x === "png" ? "image/png" : x === "zip" ? "application/zip" : "image/jpeg";
+                var x = m[1].toLowerCase(), type = x === "pdf" ? "application/pdf" : x === "png" ? "image/png" : x === "zip" ? "application/zip" : x === "dwg" || x === "dxf" ? "application/octet-stream" : "image/jpeg";
                 inner.push(new File([b], nm, { type: type }));
               });
             });
@@ -354,7 +363,7 @@
     $("#thumb-bar").hidden = !sheets.length;
     $("#sel-count").textContent = n + " of " + sheets.length + " sheets selected";
     $("#rv-run").disabled = !n || !aiReady || !!runCtl;
-    $("#rv-hint").textContent = !aiReady ? "Connect Claude above to run the check." : !sheets.length ? "No sheets loaded yet. Add PDF, PNG or JPG files, or a zip of them, in step 1." : !n ? "Select at least one sheet." : n > 12 ? "That is a lot of sheets. Each one is a separate request on your Claude usage." : "Each sheet is one request, plus one to combine the results.";
+    $("#rv-hint").textContent = !aiReady ? "Connect Claude above to run the check." : !sheets.length ? "No sheets loaded yet. Add PDF, DWG, PNG or JPG files, or a zip of them, in step 1." : !n ? "Select at least one sheet." : n > 12 ? "That is a lot of sheets. Each one is a separate request on your Claude usage." : "Each sheet is one request, plus one to combine the results.";
   }
   function rulesFor(scope) {
     return D.entries.filter(function (e) { return e.kind === "rule" && e.checkable !== false && (scope === "all" || e.scope === scope); });
