@@ -141,7 +141,7 @@
     $("#durbar").innerHTML = timed.map(function (s) { return '<i style="flex:' + s.tatMax + '" title="' + esc(s.title + ": " + (s.tatNote || "")) + '"></i>'; }).join("");
     $("#durtext").textContent = timed.length ? "If each stated step ran once, back to back: about " + lo + " to " + hi + " working days of authority time across " + timed.length + " timed steps. Several run in parallel in practice, and each resubmission restarts that step's clock." : "No stated processing times recorded for this track.";
     $("#steps").innerHTML = steps.map(function (s, i) {
-      return '<div class="step"><div class="rail"><span class="no">' + (i + 1) + '</span></div><details class="card"' + (i === 0 ? " open" : "") + "><summary><h3>" + esc(s.title) + '</h3><span class="badge acc">' + esc(s.agency) + "</span>" +
+      return '<div class="step" data-id="' + s.id + '"><div class="rail"><span class="no">' + (i + 1) + '</span></div><details class="card"' + (i === 0 ? " open" : "") + "><summary><h3>" + esc(s.title) + '</h3><span class="badge acc">' + esc(s.agency) + "</span>" +
         (s.tatNote ? '<span class="tat">' + esc(s.tatNote) + "</span>" : "") + statusBadge(s.status) + '</summary><div class="inner">' +
         '<div><span class="label">Who leads</span><p>' + esc(s.lead || "") + "</p></div>" +
         '<div><span class="label">What goes in</span>' + list(s.what) + "</div>" +
@@ -151,6 +151,7 @@
         '<div><span class="label">Reference</span><p class="ref mono">' + esc(s.ref || "") + "</p>" + srcLink(s.src) + "</div></div></details></div>";
     }).join("");
     $("#process-notes").innerHTML = D.processNotesHtml || "";
+    if (window.BPVIZ) window.BPVIZ.process(track);
   }
 
   /* ---------- generic form ---------- */
@@ -175,16 +176,17 @@
     $("#fee-notes").innerHTML = D.fees.notesHtml || "";
     var calc = function () {
       var p = formRead(D.fees.fields, "fee-"); store("bp.fees", p);
-      var total = 0, anyUnv = false, rows = "";
+      var total = 0, anyUnv = false, rows = "", parts = [];
       D.fees.items.forEach(function (it) {
         if (it.when && !it.when(p)) return;
         var r = it.calc(p); if (!r) return;
-        if (typeof r.amount === "number") total += r.amount;
+        if (typeof r.amount === "number") { total += r.amount; parts.push({ agency: it.agency, amount: r.amount }); }
         if (it.status !== "verified") anyUnv = true;
         rows += "<tr><td>" + esc(it.agency) + "</td><td><b>" + esc(it.label) + '</b><div class="small">' + esc(r.basis || "") + '</div></td><td class="num">' + (typeof r.amount === "number" ? money(r.amount) : esc(r.amount || "n/a")) + "</td><td>" + statusBadge(it.status) + ' <span class="ref mono">' + esc(it.ref || "") + "</span> " + srcLink(it.src) + "</td></tr>";
       });
       $("#fee-table").innerHTML = "<thead><tr><th>Agency</th><th>Fee and how it was worked out</th><th class=\"num\">Amount</th><th>Schedule</th></tr></thead><tbody>" + (rows || '<tr><td colspan="4">Enter the project figures above.</td></tr>') +
         '</tbody><tfoot><tr><td></td><td>Total of the fees listed' + (anyUnv ? " (includes unverified items)" : "") + '</td><td class="num">' + money(total) + "</td><td></td></tr></tfoot>";
+    if (window.BPVIZ) window.BPVIZ.fees(parts);
     };
     $("#fee-form").oninput = calc; calc();
   }
@@ -428,7 +430,7 @@
 
   /* ---------- routing + boot ---------- */
   var VIEWS = ["guide", "search", "who", "process", "fees", "check", "playbook"];
-  window.BPAPP = { search: search, entryHtml: entryHtml, setQuery: function (q) { $("#q").value = q; $("#ask-panel").hidden = true; renderSearch(); } };
+  window.BPAPP = { refresh: function () { renderProcess(); renderFees(); }, search: search, entryHtml: entryHtml, setQuery: function (q) { $("#q").value = q; $("#ask-panel").hidden = true; renderSearch(); } };
   function route() {
     var v = (location.hash || "").replace("#", ""); if (VIEWS.indexOf(v) < 0) v = "guide";
     VIEWS.forEach(function (n) { $("#v-" + n).hidden = n !== v; });

@@ -4,7 +4,7 @@
   var A = window.BPAPP, $ = function (s, r) { return (r || document).querySelector(s); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function related(q, any) {
-    var r = (any ? A.search(q, [], []) : A.search(q, ["rule"], []).filter(function (e) { return e.checkable !== false; })).slice(0, 3);
+    var r = (any ? A.search(q, [], []) : A.search(q, ["rule"], []).filter(function (e) { return e.checkable !== false; })).slice(0, 2);
     return r.length ? '<span class="label">Rules in this hub</span><div class="list">' + r.map(A.entryHtml).join("") + '</div><a href="#search" data-q="' + esc(q) + '" class="jump">See every entry on this</a>'
       : '<p class="small">No rule entry in the hub covers this yet.</p>';
   }
@@ -87,21 +87,22 @@
     return '<div class="panel"><div class="row"><h3>' + esc(h.title) + "</h3>" + (h.agency ? '<span class="badge acc">' + esc(h.agency) + "</span>" : "") + "</div><p>" + esc(h.text) + "</p>" +
       (h.how ? '<p class="small"><b>How it is checked:</b> ' + esc(h.how) + "</p>" : "") + (h.src ? '<p class="small"><a href="' + esc(h.src) + '" target="_blank" rel="noopener">Source: Government media release on the accredited checker system</a></p>' : "") + related(h.q, h.any) + "</div>";
   }
-  function wire(svgBox, items, out, onPick) {
+  var EXMAP = { "It must stand up": "grid", "People must get out in a fire": "travel", "Nobody falls or hits their head": "barrier", "Everyone can use it": "ramp", "It fits its plot and its neighbours": "setback", "Travel distance": "travel", "A second way out": "exits", "Protected exit staircase": "exits", "Stair risers, treads and handrails": "stair", "Barrier at a drop": "barrier", "Ramp at the entrance": "ramp", "Accessible toilet": "door", "Door clear width": "door", "Setback from the boundary": "setback", "Parking and access": "lot", "Daylight and ventilation": "head" };
+  function wire(svgBox, items, out, exBox) {
     var pick = function (i) {
       Array.prototype.forEach.call(svgBox.querySelectorAll(".hs"), function (g) { g.classList.toggle("on", +g.dataset.i === i); });
-      out.innerHTML = detail(items[i]); if (onPick) onPick(items[i]);
+      out.innerHTML = detail(items[i]); if (exBox) exBox.innerHTML = '<span class="label">Right and wrong on a drawing</span>' + window.BPEX(EXMAP[items[i].title]);
     };
     svgBox.addEventListener("click", function (e) { var g = e.target.closest(".hs"); if (g) pick(+g.dataset.i); });
     svgBox.addEventListener("keydown", function (e) { var g = e.target.closest(".hs"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(+g.dataset.i); } });
     return pick;
   }
 
-  $("#g-why").innerHTML = whySvg; wire($("#g-why"), WHY, $("#g-why-out"))(0);
+  $("#g-why").innerHTML = whySvg; wire($("#g-why"), WHY, $("#g-why-out"), $("#g-why-ex"))(0);
 
   var layer = "fire";
   $("#g-plan").innerHTML = planSvg;
-  var pickPlan = wire($("#g-plan"), PLAN, $("#g-plan-out"));
+  var pickPlan = wire($("#g-plan"), PLAN, $("#g-plan-out"), $("#g-plan-ex"));
   function setLayer(l) {
     layer = l; $("#g-plan").setAttribute("data-layer", l);
     $("#g-layers").innerHTML = LAYERS.map(function (x) { return '<button type="button" class="chip" data-v="' + x[0] + '" aria-pressed="' + (x[0] === l) + '">' + x[1] + "</button>"; }).join("");

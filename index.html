@@ -37,18 +37,23 @@
     </div>
 
     <h3>1. What each authority is protecting</h3>
-    <div class="viz"><div class="canvas" id="g-why"></div><div id="g-why-out"></div></div>
+    <div class="viz"><div class="col"><div class="canvas" id="g-why"></div><div class="panel" id="g-why-ex"></div></div><div id="g-why-out"></div></div>
 
     <h3>2. How an authority reads a floor plan</h3>
     <p class="lead">The same plan is checked by different authorities for different things. Pick one to see what it looks at.</p>
     <div class="chips" id="g-layers" role="group" aria-label="Authority"></div>
-    <div class="viz"><div class="canvas" id="g-plan"></div><div id="g-plan-out"></div></div>
+    <div class="viz"><div class="col"><div class="canvas" id="g-plan"></div><div class="panel" id="g-plan-ex"></div></div><div id="g-plan-out"></div></div>
 
-    <h3>3. What is in a BP drawing set</h3>
+    <h3>3. Try the rules on real dimensions</h3>
+    <p class="lead">Enter what the architect has drawn and see at once whether it meets the rule.</p>
+    <div class="chips" id="g-tests" role="group" aria-label="Tester"></div>
+    <div id="g-test"></div>
+
+    <h3>4. What is in a BP drawing set</h3>
     <div class="sheets" id="g-sheets"></div>
     <div id="g-sheet-out"></div>
 
-    <h3>4. Where to go next</h3>
+    <h3>5. Where to go next</h3>
     <div class="grid">
       <a class="navcard" href="#who"><b>Who can submit</b><span>Architect or PE, by type of project</span></a>
       <a class="navcard" href="#process"><b>The process</b><span>Each step, who acts and how long</span></a>
@@ -85,6 +90,7 @@
       <p class="lead">Which qualified person (QP) may prepare and submit which plans, and where a PE can act without an architect.</p>
     </div>
     <div id="who-headline"></div>
+    <div id="who-board"></div>
     <div class="panel">
       <h3>Check a job</h3>
       <div class="grid">
@@ -109,6 +115,7 @@
       <div class="durbar" id="durbar"></div>
       <div class="small" id="durtext"></div>
     </div>
+    <div class="panel"><span class="label">Map of the steps by authority. Boxes in the same column run in parallel. Click a box to open it.</span><div class="tw" style="border:0"><div id="p-map"></div></div></div>
     <div class="steps" id="steps"></div>
     <div id="process-notes" class="prose"></div>
   </section>
@@ -122,6 +129,7 @@
     <div class="panel">
       <div class="grid" id="fee-form"></div>
     </div>
+    <div class="panel" id="fee-bar"></div>
     <div class="tw"><table id="fee-table"></table></div>
     <div id="fee-notes" class="prose"></div>
   </section>
@@ -201,7 +209,9 @@
 <script src="data.js"></script>
 <script src="rules.js"></script>
 <script src="app.js"></script>
+<script src="examples.js"></script>
 <script src="guide.js"></script>
+<script src="viz.js"></script>
 <!--ARTIFACT-BODY-END-->
 </body>
 </html>
