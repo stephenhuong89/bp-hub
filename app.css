@@ -279,3 +279,20 @@ input[type=range] { width: 100%; accent-color: var(--accent); padding: 0; }
 .tiles { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
 .tile b { font-size: clamp(1.8rem, 3.2vw, 2.5rem); overflow-wrap: normal; }
 .tile.na b { color: var(--ink-3); font-size: 1.5rem; } .tile.na { border-style: dashed; }
+
+/* game, bubbles, gateways */
+.gm { cursor: crosshair; } .gm .lotr { fill: none; stroke: var(--ink); stroke-width: 1.5; } .gm .hit { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 2.5; opacity: .75; } .gm .hit.late { stroke-dasharray: 6 4; opacity: .5; } .gm .t { font-size: 10.5px; }
+.chk.todo { background: var(--mute-soft); border-color: var(--line); color: var(--ink-3); } .chk.todo b { color: var(--ink-3); font-size: .9rem; }
+.bub .grid { stroke: var(--line-2); stroke-width: 1; } .bb { cursor: pointer; } .bb circle { stroke: var(--sheet); stroke-width: 2; opacity: .88; } .bb.k-collapse circle { fill: var(--viz1); } .bb.k-fire circle { fill: var(--viz2); }
+.bb:hover circle, .bb.on circle, .bb:focus circle { stroke: var(--ink); stroke-width: 3; opacity: 1; } .bb:focus { outline: none; } .bb text { fill: var(--ink); font-size: 11px; }
+.gates .gl { fill: none; } .gates .gl.old { stroke: var(--viz-mute); stroke-width: 1.2; } .gates .gl.new { stroke: var(--viz1); stroke-width: 3; } .gates .gl.thin { stroke: var(--viz1); stroke-width: 1; opacity: .55; }
+.gates .gnode { fill: var(--mute-soft); stroke: var(--line); } .gates .gate { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; } .gates .gt { fill: var(--ink); font-weight: 600; }
+#p-gates > div { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+/* brand and quotations */
+a.brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); } a.brand img { width: 38px; height: 38px; border-radius: 50%; background: #fff; padding: 2px; flex: none; } a.brand span { color: var(--ink); }
+.quote { margin: 0; padding: 22px 0 22px 22px; border-left: 5px solid #d3141b; display: flex; flex-direction: column; gap: 10px; max-width: 46ch; }
+.quote blockquote { margin: 0; font-family: var(--f-head); font-weight: 600; font-size: clamp(1.5rem, 3.4vw, 2.4rem); line-height: 1.18; text-wrap: balance; }
+.quote .qtail { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-2); display: block; margin-top: 8px; line-height: 1.5; }
+.quote figcaption { font-size: .82rem; color: var(--ink-3); } .quote figcaption a { color: var(--ink-2); }
+.quote.sm { padding: 10px 0 10px 16px; max-width: 70ch; gap: 6px; } .quote.sm blockquote { font-size: 1.2rem; }

@@ -129,6 +129,21 @@
     $("#fee-bar").innerHTML = total ? '<span class="label">Share of the total by authority</span><div class="fbar">' + ks.map(function (k) { return '<i style="flex:' + by[k] + ";background:" + (FC[k] || "var(--ink-3)") + '" title="' + k + '"></i>'; }).join("") + '</div><div class="row">' + ks.map(function (k) { return '<span class="lg"><i style="background:' + (FC[k] || "var(--ink-3)") + '"></i>' + k + " S$" + by[k].toLocaleString("en-SG") + " (" + Math.round(by[k] / total * 100) + "%)</span>"; }).join("") + "</div>" : "";
   }
 
+  (function gates() {
+    var AG = ["URA", "BCA", "SCDF", "LTA", "PUB", "NEA", "NParks"], el = $("#p-gates"); if (!el) return;
+    var ag = function (x) { return AG.map(function (a, i) { return '<rect x="' + x + '" y="' + (14 + i * 30) + '" width="62" height="22" rx="3" class="gnode"/><text x="' + (x + 31) + '" y="' + (29 + i * 30) + '" class="t mid">' + a + "</text>"; }).join(""); };
+    var before = "", after = "", i, k;
+    for (i = 0; i < 7; i++) for (k = 0; k < 3; k++) before += '<path d="M70 ' + (100 + k * 16) + " C 170 " + (100 + k * 16) + ", 180 " + (19 + i * 30 + k * 6) + ", 268 " + (19 + i * 30 + k * 6) + '" class="gl old"/>';
+    ["Design", "Construction", "Completion"].forEach(function (g, j) {
+      var gy = 44 + j * 66;
+      after += '<path d="M70 116 C 100 116, 100 ' + (gy + 14) + ", 122 " + (gy + 14) + '" class="gl new"/><rect x="122" y="' + gy + '" width="92" height="28" rx="3" class="gate"/><text x="168" y="' + (gy + 18) + '" class="t mid gt">' + g + "</text>";
+      for (i = 0; i < 7; i++) after += '<path d="M214 ' + (gy + 14) + " C 244 " + (gy + 14) + ", 244 " + (25 + i * 30) + ", 268 " + (25 + i * 30) + '" class="gl thin"/>';
+    });
+    var proj = '<rect x="6" y="96" width="64" height="40" rx="3" class="gate"/><text x="38" y="120" class="t mid gt">Project</text>';
+    el.innerHTML = '<div><h3>Before: every agency separately</h3><svg viewBox="0 0 340 232" class="dwg gates">' + before + proj + ag(268) + '</svg><p class="small">Each QP submitted to each agency at each stage, and chased each reply.</p></div>' +
+      '<div><h3>CORENET X: three gateways</h3><svg viewBox="0 0 340 232" class="dwg gates">' + after + proj + ag(268) + '</svg><p class="small">One coordinated submission per gateway. All seven agencies answer together within 20 working days.</p></div>';
+  })();
+
   window.BPVIZ = { process: processMap, fees: feeBar };
   A.refresh();
 })();

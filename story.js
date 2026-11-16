@@ -17,7 +17,24 @@
   }
   function chart(title, note, rows, opt) { return '<div class="panel"><h3>' + esc(title) + "</h3>" + bars(rows, opt) + '<p class="small">' + note + "</p></div>"; }
 
-  var out = "";
+  function bubbles() {
+    var W = 900, H = 250, x0 = 40, x1 = 870, y = { collapse: 86, fire: 176 };
+    var mo = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+    var X = function (d) { var m = mo[d.date.split(" ")[1]] || 0; return x0 + ((d.year + m / 12) - 1985) / (2027 - 1985) * (x1 - x0); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" class="dwg bub" role="img" aria-label="Timeline of building failures and fires, circle size showing deaths">';
+    for (var yr = 1985; yr <= 2025; yr += 5) { var gx = x0 + (yr - 1985) / 42 * (x1 - x0); s += '<line x1="' + gx + '" y1="24" x2="' + gx + '" y2="226" class="grid"/><text x="' + gx + '" y="244" class="t mid">' + yr + "</text>"; }
+    s += '<text x="4" y="18" class="t">COLLAPSES (top row) AND FIRES (bottom row)</text>'; var lab = { collapse: 0, fire: 0 };
+    S.disasters.map(function (d, i) { return { d: d, i: i }; }).sort(function (a, b) { return b.d.deaths - a.d.deaths; }).forEach(function (o) {
+      var d = o.d, r = Math.sqrt(d.deaths) * 2.3;
+      s += '<g class="bb k-' + d.type + '" data-i="' + o.i + '" tabindex="0" role="button" aria-label="' + esc(d.name + ", " + d.country + ", " + d.year + ", " + (d.label || d.deaths) + " deaths") + '"><title>' + esc(d.name + ", " + d.country + " (" + d.year + "): " + (d.label || d.deaths) + " deaths") + '</title><circle cx="' + X(d) + '" cy="' + y[d.type] + '" r="' + r + '"/>' + (d.deaths >= 96 || d.country === "Singapore" ? '<text x="' + X(d) + '" y="' + (lab[d.type]++ % 2 ? y[d.type] + r + 14 : y[d.type] - r - 5) + '" class="t mid">' + esc(d.name.split(" ").slice(0, 2).join(" ") + " " + (d.label || d.deaths)) + "</text>" : "") + "</g>";
+    });
+    return s + '</svg><p class="small">Each circle is one event; its area shows the number of deaths.</p>';
+  }
+  function quote(k) {
+    var q = (S.quotes || {})[k]; if (!q) return "";
+    return '<figure class="quote">' + (q.lead ? '<span class="label">' + esc(q.lead) + "</span>" : "") + "<blockquote>" + (q.paraphrase ? "" : "\u201C") + esc(q.text) + (q.paraphrase ? "" : "\u201D") + (q.tail ? ' <span class="qtail">' + esc(q.tail) + "</span>" : "") + "</blockquote><figcaption>" + src(q.src, q.by) + "</figcaption></figure>";
+  }
+  var out = quote("hammurabi");
 
   /* 1. hero numbers */
   if (S.tiles && S.tiles.length) out += sec(S.tilesTitle || "Singapore in numbers", S.tilesSub || "", '<div class="tiles">' + S.tiles.map(function (t) {
@@ -29,6 +46,8 @@
     return '<div class="panel"><h3>' + esc(se.title) + '</h3><div class="cols" role="img" aria-label="' + esc(se.title) + '">' + se.pts.map(function (p, i) {
       return '<div class="col-b' + (i === se.pts.length - 1 ? " em" : "") + '" title="' + esc(p[0] + ": " + fmt(p[1])) + '"><span class="cv">' + fmt(p[1]) + '</span><i style="height:' + Math.max(2, p[1] / max * 100) + '%"></i><span class="cl">' + esc(String(p[0]).slice(2)) + "</span></div>"; }).join("") + '</div><p class="small">' + esc(se.note) + " " + src(se.src, se.by) + "</p></div>"; }).join("") + "</div>");
 
+  out += quote("fire");
+
   /* 3. law timeline */
   if (S.timeline && S.timeline.length) out += sec("Each rule was written after something went wrong", "Singapore's building laws, in the order they arrived.", '<ol class="tl">' + S.timeline.map(function (t) {
     return '<li class="' + (t.bad ? "bad" : "") + '"><span class="yr">' + esc(t.year) + "</span><div><b>" + esc(t.event) + "</b>" + (t.law ? "<span>" + esc(t.law) + "</span>" : "") + "<small>" + src(t.src, t.by) + "</small></div></li>"; }).join("") + "</ol>");
@@ -37,10 +56,12 @@
   if (S.disasters) {
     var dmax = Math.max.apply(null, S.disasters.map(function (d) { return d.deaths; }));
     out += sec("What happens when the check is skipped", S.disasters.length + " building failures and fires in Southeast Asia since 1986. Almost every inquiry found the same things: floors added without approval, exits that were never built, permits signed off anyway. Click a row.",
-      '<div class="panel"><div class="legend"><span class="lg"><i class="k-collapse"></i>Collapse</span><span class="lg"><i class="k-fire"></i>Fire</span></div><div class="dz" id="dz">' + S.disasters.map(function (d, i) {
+      '<div class="panel">' + bubbles() + '<div class="legend"><span class="lg"><i class="k-collapse"></i>Collapse</span><span class="lg"><i class="k-fire"></i>Fire</span></div><div class="dz" id="dz">' + S.disasters.map(function (d, i) {
         return '<button type="button" class="dz-row k-' + d.type + '" data-i="' + i + '"><span class="dz-y">' + d.year + '</span><span class="dz-n">' + esc(d.name) + '<small>' + esc(d.country) + " · " + (d.type === "fire" ? "Fire" : "Collapse") + '</small></span><span class="dz-t"><i style="width:' + Math.max(2, d.deaths / dmax * 100) + '%"></i></span><span class="dz-v">' + esc(d.label || d.deaths) + "</span></button>"; }).join("") + '</div><div id="dz-out" class="dz-out"></div></div>',
       "Deaths as reported. Most accounts were read on Wikipedia pages that cite the official inquiry or court record; rows marked \"reported\" come from a single news report.");
   }
+
+  out += quote("thai");
 
   /* 5. comparison charts */
   if (S.db) {
@@ -66,6 +87,7 @@
   if (S.drives && S.drives.length) out += sec(S.drivesTitle || "What drives Singapore", S.drivesSub || "", '<div class="tiles">' + S.drives.map(function (t) {
     return '<div class="tile' + (/^Not/.test(t.n) ? ' na' : '') + '"><b>' + esc(t.n) + "</b><span>" + esc(t.label) + "</span><small>" + esc(t.year || "") + " · " + src(t.src, t.by) + "</small></div>"; }).join("") + "</div>");
 
+  out += quote("bca");
   $("#story").innerHTML = out;
 
   var dz = $("#dz");
@@ -73,9 +95,12 @@
     var show = function (i) {
       var d = S.disasters[i];
       Array.prototype.forEach.call(dz.children, function (b, k) { b.classList.toggle("on", k === i); });
+      Array.prototype.forEach.call(document.querySelectorAll(".bb"), function (g) { g.classList.toggle("on", +g.dataset.i === i); });
       $("#dz-out").innerHTML = "<b>" + esc(d.date + " · " + d.name + ", " + d.country) + "</b><p>" + esc(d.found) + '</p><p class="small">' + (d.grade ? esc(d.grade) + " · " : "") + src(d.src, "Source") + "</p>";
     };
     dz.addEventListener("click", function (e) { var b = e.target.closest(".dz-row"); if (b) show(+b.dataset.i); });
+    var bub = document.querySelector(".bub");
+    if (bub) { var pick = function (e) { var g = e.target.closest(".bb"); if (!g) return; if (e.type === "keydown" && e.key !== "Enter") return; show(+g.dataset.i); document.getElementById("dz-out").scrollIntoView({ behavior: "smooth", block: "nearest" }); }; bub.addEventListener("click", pick); bub.addEventListener("keydown", pick); }
     show(0);
   }
 })();

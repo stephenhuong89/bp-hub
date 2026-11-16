@@ -14,7 +14,7 @@
 
 <header class="top">
   <div class="wrap">
-    <div class="brand">CVC <span>BP Submission Hub</span></div>
+    <a class="brand" href="#story"><img src="logo.png" alt="CVC Engineers Pte Ltd" width="38" height="38"><span>BP Submission Hub</span></a>
     <nav id="nav" aria-label="Sections">
       <a href="#story">Why BP</a>
       <a href="#guide">Learn</a>
@@ -56,6 +56,10 @@
       <p class="lead">Drawings go to the authorities before anything is built. Click the numbered points.</p>
       <div class="searchbar"><input type="search" id="g-q" placeholder="Or search the rules directly and press Enter" aria-label="Search the hub"></div>
     </div>
+
+    <h3>Spot the no-nos</h3>
+    <p class="lead">This plan would be rejected for eight reasons. Find them.</p>
+    <div class="viz"><div class="canvas" id="gm-plan"></div><div class="panel" id="gm-side"></div></div>
 
     <h3>1. What each authority is protecting</h3>
     <div class="viz"><div class="col"><div class="canvas" id="g-why"></div><div class="panel" id="g-why-ex"></div></div><div id="g-why-out"></div></div>
@@ -136,6 +140,7 @@
       <div class="durbar" id="durbar"></div>
       <div class="small" id="durtext"></div>
     </div>
+    <div class="panel"><span class="label">What CORENET X changed</span><div class="grid2" id="p-gates"></div><p class="srcline">BCA and URA describe the change as streamlining "over 20 approval touchpoints across seven regulatory agencies to three key gateways". The lines are illustrative. <a href="https://www.ura.gov.sg/guidelines/circulars/dc25-07/" target="_blank" rel="noopener">Joint circular, 10 Sep 2025</a></p></div>
     <div class="panel"><span class="label">Map of the steps by authority. Boxes in the same column run in parallel. Click a box to open it.</span><div class="tw" style="border:0"><div id="p-map"></div></div></div>
     <div class="steps" id="steps"></div>
     <div id="process-notes" class="prose"></div>
@@ -161,6 +166,7 @@
       <h2>Drawing compliance check</h2>
       <p class="lead">Upload the architect's drawings. Each sheet is read against the rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen.</p>
     </div>
+    <figure class="quote sm"><blockquote>“act with prime regard to public safety and interests”</blockquote><figcaption><a href="https://www1.peb.gov.sg/about-us/pe-pledge/" target="_blank" rel="noopener">The Professional Engineer’s Pledge, Professional Engineers Board Singapore</a>. Every drawing you check here is that promise being kept.</figcaption></figure>
     <div class="note" id="ai-off" hidden>AI review is not available in this view. Open the hub from its claude.ai link while signed in, and allow it to use Claude when asked. Search, process, fees and the pathway pre-check below work without it.</div>
 
     <div class="panel">
@@ -233,6 +239,7 @@
 <script src="examples.js"></script>
 <script src="guide.js"></script>
 <script src="viz.js"></script>
+<script src="game.js"></script>
 <script src="whatif.js"></script>
 <script src="stats.js"></script>
 <script src="story.js"></script>
