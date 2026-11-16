@@ -12,7 +12,7 @@ window.BPSTATS = {
    "src": "https://tablebuilder.singstat.gov.sg/table/TS/M810001"
   },
   {
-   "n": "1.62 million",
+   "n": "1.62M",
    "label": "homes, and 76% of residents live in HDB flats",
    "year": "June 2025",
    "by": "SingStat",

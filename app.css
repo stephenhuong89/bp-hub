@@ -363,3 +363,49 @@ details.more { border: 1px solid var(--line); border-radius: var(--r); backgroun
   .case header { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); column-gap: 32px; align-items: end; } .case header .label { grid-column: 1 / -1; } .case h2 { max-width: none; } .case header .small { text-align: right; font-size: 1rem; }
   .lesson { max-width: none; } .lesson blockquote { max-width: none; }
 }
+
+/* ===== Redesign (approved 16 Nov 2026): one light look. Paper and ink, CVC red, condensed upper-case headlines, square frames. ===== */
+:root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  --paper: #F3F4F5; --sheet: #FFFFFF; --ink: #10171D; --ink-2: #47535E; --ink-3: #66727C; --line: #D5DADE; --line-2: #E6E9EC;
+  --accent: #17547D; --accent-ink: #FFFFFF; --accent-soft: #E4EEF5; --ok: #1B6E45; --ok-soft: #E3F2EA; --bad: #C9131A; --bad-soft: #FBE9EA;
+  --warn: #8A5A00; --warn-soft: #FBF0CC; --mute-soft: #E9ECEE; --viz1: #2a78d6; --viz2: #eb6834; --viz-mute: #B9C1C7;
+  --f-head: "Barlow Condensed", "Arial Narrow", Arial, sans-serif; --r: 0px; color-scheme: light;
+}
+body { font-size: 16px; }
+h1, h2, h3 { text-transform: uppercase; font-weight: 700; letter-spacing: 0; }
+h2 { font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1; } h3 { font-size: 1.3rem; line-height: 1.05; }
+.hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.4rem); line-height: .95; } .st h2 { font-size: clamp(2rem, 4vw, 2.9rem); } .case h2 { font-size: clamp(2.2rem, 5.4vw, 4.6rem); line-height: .95; }
+.label { color: var(--bad); font-size: .76rem; letter-spacing: .1em; } .panel .label, .frame .fno, .bucket .label, .gatebox .label { color: var(--ink-2); }
+.wrap { max-width: 1240px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+/* header */
+.top .wrap { padding-block: 12px; } a.brand img { width: 44px; height: 44px; padding: 0; } a.brand span { font-family: var(--f-head); font-weight: 700; font-size: 1.45rem; text-transform: uppercase; letter-spacing: .02em; }
+nav { justify-content: flex-end; } nav a { color: var(--ink); padding: 9px 13px; font-size: .95rem; } nav a[aria-current="page"] { background: var(--ink); color: #fff; }
+nav a[href="#check"] { background: var(--bad); color: #fff; font-weight: 600; } nav a[href="#check"]:hover { background: var(--ink); color: #fff; }
+/* controls */
+.btn { background: var(--bad); border: 2px solid var(--bad); color: #fff; padding: 12px 20px; font-size: 1rem; } .btn.ghost { background: transparent; border-color: var(--ink); color: var(--ink); } .btn.sm { padding: 8px 14px; font-size: .9rem; }
+.chip { border-radius: 0; padding: 7px 14px; font-size: .9rem; color: var(--ink); border-color: var(--ink-3); } .chip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+input[type=text], input[type=number], input[type=search], select, textarea { border: 2px solid var(--ink); padding: 10px 12px; } .searchbar input { font-size: 1.15rem; padding: 14px 16px; }
+/* frames */
+.canvas, .frame, .ex, .case, .drop { border: 2px solid var(--ink); } .case { border-top: 8px solid var(--bad); padding: 26px; } .frame { background: var(--sheet); }
+.entry .tb .ag, .kpi b, .wi-count, .alsoc b, .numcard b { font-family: var(--f-head); } .numcard b { color: var(--ink); font-size: 2.6rem; } .numcard:hover { border-color: var(--bad); }
+/* black band of figures */
+.tiles { gap: 0; background: var(--ink); padding: 26px 22px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); row-gap: 26px; column-gap: 26px; }
+.tile, .mo .tile:hover { background: transparent; border: 0; border-top: 4px solid var(--bad); padding: 12px 0 0; color: #fff; box-shadow: none; }
+.tile b { color: #fff; font-size: clamp(2.6rem, 5vw, 4.2rem); line-height: .95; } .tile span { color: #fff; } .tile small, .tile small a { color: #B9C1C7; }
+.tile.na { border-style: solid; border-top-color: #66727C; } .tile.na b { color: #B9C1C7; font-size: 2rem; }
+/* red bands */
+.quote.wide { background: var(--bad); color: #fff; border-left: 0; padding: 36px; } .quote.wide blockquote { text-transform: uppercase; font-weight: 700; line-height: 1.02; max-width: 24ch; }
+.quote.wide .label, .quote.wide figcaption, .quote.wide figcaption a, .quote.wide .qtail { color: #fff; } .quote.wide .qtail { text-transform: none; }
+.qside { border: 0; } .qside b { color: var(--bad); } .quote.sm { border-left-color: var(--bad); }
+.costs { background: var(--bad); color: #fff; padding: 22px 26px; margin-inline: -26px; gap: 22px; } .cost { border-left: 0; padding: 0; } .cost b { color: #fff; font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: .95; } .cost span { color: #fff; font-size: 1rem; }
+.note.bad { background: var(--bad); color: #fff; border: 0; padding: 16px 18px; font-size: 1rem; } .note.bad b { text-transform: uppercase; font-family: var(--f-head); font-size: 1.4rem; display: block; }
+/* charts and diagrams */
+.hb-row.em .hb-t i, .col-b.em i { background: var(--bad); } .hb-t i, .dz-t i, .col-b i, .gantt .gb { border-radius: 0; }
+.sc .sky { fill: #E8EEF2; } .road .rd { stroke: var(--ink); } .road .rdl { stroke: #fff; } .stn circle { stroke: var(--ink); } .stn.done circle { stroke: var(--ok); }
+.step .no { border-radius: 0; border-color: var(--ink); color: var(--ink); } .step .card { border: 2px solid var(--ink); }
+.pbcol, .bucket { border-width: 0; border-top-width: 6px; border-top-style: solid; } .kpi { border: 2px solid var(--ink); } .finding { border-left-width: 8px; }
+.navcard { border: 2px solid var(--ink); padding: 16px; } .navcard b { color: var(--ink); font-size: 1.4rem; text-transform: uppercase; } .navcard:hover { background: var(--ink); } .navcard:hover b, .navcard:hover span { color: #fff; }
+.sw { border-radius: 0; } .stamp { border-radius: 0; } .badge { border-radius: 0; } .thumb, .sheet { border-radius: 0; }
+footer { background: var(--ink); color: #B9C1C7; border: 0; }
+.tile b { font-size: clamp(2.4rem, 4.4vw, 3.8rem); white-space: nowrap; } .tile.na b { white-space: normal; }
+@media (max-width: 700px) { .costs { margin-inline: -16px; padding: 18px 16px; } .case { padding: 16px; } .quote.wide { padding: 22px 18px; } .tiles { padding: 20px 16px; } nav { justify-content: flex-start; } }
