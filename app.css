@@ -163,3 +163,34 @@ tfoot td { font-weight: 700; border-top: 2px solid var(--line); }
 .fb input { flex: 1 1 200px; padding: 4px 8px; font-size: .82rem; }
 footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var(--ink-3); font-size: .8rem; }
 @media (prefers-reduced-motion: no-preference) { .chip, .btn, nav a { transition: background-color .12s, color .12s; } }
+
+/* visual guide */
+.viz { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 860px) { .viz { grid-template-columns: 1fr; } }
+.canvas { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; min-width: 0; }
+.viz .list .entry { grid-template-columns: 1fr; } .viz .list .entry .tb { border-right: 0; border-bottom: 1px solid var(--line); flex-direction: row; flex-wrap: wrap; align-items: center; }
+.dwg { display: block; width: 100%; height: auto; }
+.dwg .ln { stroke: var(--ink); stroke-width: 2; fill: none; } .dwg .ln.thin { stroke-width: 1; stroke: var(--ink-3); } .dwg .ln.thick { stroke-width: 4; } .dwg .ln.dash { stroke-dasharray: 6 5; stroke: var(--ink-3); }
+.dwg .bld { fill: var(--sheet); stroke: var(--ink); stroke-width: 3; } .dwg .core { fill: var(--mute-soft); stroke: var(--ink); stroke-width: 2; } .dwg .nb { fill: var(--mute-soft); stroke: var(--ink-3); stroke-width: 1.5; }
+.dwg .ground, .dwg .road { fill: var(--mute-soft); stroke: none; } .dwg .bnd { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 10 4 2 4; }
+.dwg .win { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; } .dwg .ftg, .dwg .shl { fill: var(--line); stroke: var(--ink); stroke-width: 1.5; } .dwg .lift { fill: var(--sheet); stroke: var(--ink); stroke-width: 1.5; }
+.dwg .bal, .dwg .rampfill, .dwg .ramp { fill: var(--line-2); stroke: var(--ink); stroke-width: 1.5; } .dwg .tree { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+.dwg .door { fill: none; stroke: var(--ink-2); stroke-width: 1.2; } .dwg .dim { stroke: var(--ok); stroke-width: 2; marker-start: none; }
+.dwg .t { font-family: var(--f-mono); font-size: 11px; fill: var(--ink-2); } .dwg .mid { text-anchor: middle; }
+.dwg .sht { fill: var(--sheet); stroke: var(--ink-3); stroke-width: 1.5; } .dwg .tbk { fill: var(--mute-soft); stroke: var(--ink-3); stroke-width: 1; }
+.dwg .path { fill: none; stroke: var(--bad); stroke-width: 4; stroke-dasharray: 10 7; stroke-linecap: round; } .dwg .path.alt { stroke-width: 2.5; opacity: .6; }
+.dwg .fea { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 1.5; stroke-dasharray: 6 4; } .dwg .gfa { fill: var(--ok-soft); opacity: .55; stroke: none; }
+.dwg .lay { display: none; } [data-layer="fire"] .lay.L-fire, [data-layer="planning"] .lay.L-planning { display: block; }
+.hs { cursor: pointer; } .hs circle { fill: var(--sheet); stroke-width: 2.5; stroke: var(--ink-3); } .hs text { font-family: var(--f-mono); font-size: 12px; font-weight: 600; text-anchor: middle; fill: var(--ink); pointer-events: none; }
+.hs.L-fire circle { stroke: var(--bad); } .hs.L-safety circle { stroke: var(--warn); } .hs.L-access circle { stroke: var(--accent); } .hs.L-planning circle { stroke: var(--ok); } .hs.L-other circle { stroke: var(--ink-2); }
+.hs.on.L-fire circle { fill: var(--bad); } .hs.on.L-safety circle { fill: var(--warn); } .hs.on.L-access circle { fill: var(--accent); } .hs.on.L-planning circle { fill: var(--ok); } .hs.on.L-other circle { fill: var(--ink-2); }
+.hs.on text { fill: var(--sheet); } .hs:focus-visible circle { stroke-width: 5; } .hs:focus { outline: none; }
+#g-plan[data-layer] .hs { opacity: .22; } #g-plan[data-layer="fire"] .hs.L-fire, #g-plan[data-layer="safety"] .hs.L-safety, #g-plan[data-layer="access"] .hs.L-access, #g-plan[data-layer="planning"] .hs.L-planning { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) { .dwg .path { animation: walk 1.4s linear infinite; } @keyframes walk { to { stroke-dashoffset: -34; } } .hs circle { transition: fill .15s; } }
+.sheets { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.sheet { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--r); padding: 6px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; text-align: left; font-size: .85rem; font-weight: 500; }
+.sheet.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.navcard { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; background: var(--sheet); border: 1px solid var(--line); border-radius: var(--r); text-decoration: none; color: var(--ink); }
+.navcard:hover { border-color: var(--accent); } .navcard b { font-family: var(--f-head); font-size: 1.05rem; color: var(--accent); } .navcard span { font-size: .85rem; color: var(--ink-2); }
+.panel ul { margin: 0; padding-left: 18px; }
+[hidden] { display: none !important; }

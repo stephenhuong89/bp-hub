@@ -16,6 +16,7 @@
   <div class="wrap">
     <div class="brand">CVC <span>BP Submission Hub</span></div>
     <nav id="nav" aria-label="Sections">
+      <a href="#guide">Start here</a>
       <a href="#search">Search</a>
       <a href="#who">Who can submit</a>
       <a href="#process">Process</a>
@@ -27,8 +28,37 @@
 </header>
 
 <main class="wrap">
+  <!-- GUIDE -->
+  <section class="view" id="v-guide">
+    <div class="view-head">
+      <h2>What a building plan submission is, and why it exists</h2>
+      <p class="lead">Before anything is built in Singapore, drawings of it go to the authorities, who check that it will stand up, let people escape a fire, be safe and usable, and fit its site. That check is the building plan (BP) submission. Click the numbered points on each drawing.</p>
+      <div class="searchbar"><input type="search" id="g-q" placeholder="Or search the rules directly and press Enter" aria-label="Search the hub"></div>
+    </div>
+
+    <h3>1. What each authority is protecting</h3>
+    <div class="viz"><div class="canvas" id="g-why"></div><div id="g-why-out"></div></div>
+
+    <h3>2. How an authority reads a floor plan</h3>
+    <p class="lead">The same plan is checked by different authorities for different things. Pick one to see what it looks at.</p>
+    <div class="chips" id="g-layers" role="group" aria-label="Authority"></div>
+    <div class="viz"><div class="canvas" id="g-plan"></div><div id="g-plan-out"></div></div>
+
+    <h3>3. What is in a BP drawing set</h3>
+    <div class="sheets" id="g-sheets"></div>
+    <div id="g-sheet-out"></div>
+
+    <h3>4. Where to go next</h3>
+    <div class="grid">
+      <a class="navcard" href="#who"><b>Who can submit</b><span>Architect or PE, by type of project</span></a>
+      <a class="navcard" href="#process"><b>The process</b><span>Each step, who acts and how long</span></a>
+      <a class="navcard" href="#fees"><b>Authority fees</b><span>Worked out from the schedules</span></a>
+      <a class="navcard" href="#check"><b>Check drawings</b><span>Upload a set for an AI screen</span></a>
+    </div>
+  </section>
+
   <!-- SEARCH -->
-  <section class="view" id="v-search">
+  <section class="view" id="v-search" hidden>
     <div class="view-head">
       <h2>Search Singapore building plan submission rules</h2>
       <p class="lead">Every rule, process step, fee, role and hurdle in this hub is one searchable entry with its clause reference and source. Entries marked unverified have not been confirmed against the primary document yet.</p>
@@ -169,7 +199,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 <script src="data.js"></script>
+<script src="rules.js"></script>
 <script src="app.js"></script>
+<script src="guide.js"></script>
 <!--ARTIFACT-BODY-END-->
 </body>
 </html>

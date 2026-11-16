@@ -7,7 +7,7 @@
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
   function money(n) { return "S$" + Number(n).toLocaleString("en-SG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function srcLink(src, text) { return src ? '<a href="' + esc(src) + '" target="_blank" rel="noopener">' + esc(text || "Source") + "</a>" : ""; }
-  function statusBadge(st) { return st === "verified" ? '<span class="badge ok">Verified</span>' : '<span class="badge warn">Unverified</span>'; }
+  function statusBadge(st) { return st === "verified" ? '<span class="badge ok">Verified</span>' : st === "web" ? '<span class="badge acc" title="Read from the official web page; spot-check table values">Official page</span>' : '<span class="badge warn">Unverified</span>'; }
   function list(a) { return a && a.length ? "<ul>" + a.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : '<p class="small">None recorded.</p>'; }
 
   /* ---------- index: every entry in one searchable list ---------- */
@@ -19,7 +19,7 @@
       body: (s.what || []).join(" ") + (s.tatNote ? " Processing time: " + s.tatNote : ""), evidence: "", tags: (s.hurdles || []).join(" ") + " " + (s.out || []).join(" "), go: "process" });
   });
   D.who.options.forEach(function (o) {
-    ALL.push({ id: "who-" + o.id, kind: "role", title: o.label, agency: o.agency || "BCA", ref: o.ref, src: o.src, status: o.confidence === "High" ? "verified" : "unverified",
+    ALL.push({ id: "who-" + o.id, kind: "role", title: o.label, agency: o.agency || "BCA", ref: o.ref, src: o.src, status: o.confidence === "High" ? "verified" : o.confidence === "Medium" ? "web" : "unverified",
       body: o.qp + ". " + (o.basis || ""), tags: "qualified person QP architect professional engineer PE submit " + (o.tags || ""), go: "who" });
   });
   D.fees.items.forEach(function (f) {
@@ -234,7 +234,7 @@
     var vp1 = page.getViewport({ scale: 1 }), s = edge / Math.max(vp1.width, vp1.height), vp = page.getViewport({ scale: s });
     var c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
-    return page.render({ canvasContext: g, viewport: vp }).promise.then(function () { return c; });
+    return page.render({ canvasContext: g, viewport: vp, intent: "print" }).promise.then(function () { return c; });
   }
   function addFiles(files) {
     var chain = Promise.resolve();
@@ -281,7 +281,7 @@
   function rulesFor(scope) {
     return D.entries.filter(function (e) { return e.kind === "rule" && e.checkable !== false && (scope === "all" || e.scope === scope); });
   }
-  function ruleLine(e) { return e.id + " | " + (e.agency || "") + " | " + e.title + ": " + e.body + (e.evidence ? " | Look for: " + e.evidence : "") + (e.status !== "verified" ? " | (unverified rule)" : ""); }
+  function ruleLine(e) { return e.id + " | " + (e.agency || "") + " | " + e.title + ": " + e.body + (e.evidence ? " | Look for: " + e.evidence : "") + (e.status === "unverified" ? " | (unverified rule)" : ""); }
   function lessonText() {
     if (!lessons.length) return "";
     return "\n\nCORRECTIONS FROM THE TEAM ON EARLIER REVIEWS (apply them):\n" + lessons.slice(0, 30).map(function (l) { return "- Rule " + l.rule + ": checker said " + l.said + ", team marked it " + (l.right ? "right" : "WRONG") + (l.note ? ". Note: " + l.note : ""); }).join("\n");
@@ -363,7 +363,7 @@
     if ((rep.hurdles || []).length) html += '<h3>Hurdles, most serious first</h3><div class="tw"><table><thead><tr><th>Agency</th><th>Issue</th><th>Severity</th></tr></thead><tbody>' + rep.hurdles.map(function (h) { return "<tr><td>" + esc(h.agency) + "</td><td>" + esc(h.issue) + '</td><td><span class="badge ' + (h.severity === "high" ? "bad" : h.severity === "medium" ? "warn" : "") + '">' + esc(h.severity) + "</span></td></tr>"; }).join("") + "</tbody></table></div>";
     html += '<h3>Findings by rule</h3><div class="list">' + (sorted.length ? sorted.map(function (x, i) {
       var r = RULE[x.rule_id], st = ST[x.status] || ST.unclear;
-      return '<div class="finding ' + esc(x.status) + '"><div class="hd"><b>' + esc(r ? r.title : x.rule_id) + '</b><span class="badge ' + st[0] + '">' + st[1] + '</span><span class="badge">' + esc(r ? r.agency : "") + "</span>" + (r && r.status !== "verified" ? '<span class="badge warn">Rule unverified</span>' : "") + "</div>" +
+      return '<div class="finding ' + esc(x.status) + '"><div class="hd"><b>' + esc(r ? r.title : x.rule_id) + '</b><span class="badge ' + st[0] + '">' + st[1] + '</span><span class="badge">' + esc(r ? r.agency : "") + "</span>" + (r && r.status === "unverified" ? '<span class="badge warn">Rule unverified</span>' : "") + "</div>" +
         "<p>" + esc(x.reason || "") + "</p>" + (x.value_found ? "<p><b>Read from sheet:</b> " + esc(x.value_found) + (x.location ? " at " + esc(x.location) : "") + "</p>" : "") +
         (r ? '<p class="small"><b>Requirement:</b> ' + esc(r.body) + ' <span class="ref mono">' + esc(r.ref || "") + "</span> " + srcLink(r.src) + "</p>" : "") +
         ((x.sheets || []).length ? '<p class="small">Sheets: ' + esc(x.sheets.join(", ")) + "</p>" : "") +
@@ -427,9 +427,10 @@
   }
 
   /* ---------- routing + boot ---------- */
-  var VIEWS = ["search", "who", "process", "fees", "check", "playbook"];
+  var VIEWS = ["guide", "search", "who", "process", "fees", "check", "playbook"];
+  window.BPAPP = { search: search, entryHtml: entryHtml, setQuery: function (q) { $("#q").value = q; $("#ask-panel").hidden = true; renderSearch(); } };
   function route() {
-    var v = (location.hash || "").replace("#", ""); if (VIEWS.indexOf(v) < 0) v = "search";
+    var v = (location.hash || "").replace("#", ""); if (VIEWS.indexOf(v) < 0) v = "guide";
     VIEWS.forEach(function (n) { $("#v-" + n).hidden = n !== v; });
     $$("#nav a").forEach(function (a) { if (a.getAttribute("href") === "#" + v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     window.scrollTo(0, 0);
@@ -444,7 +445,7 @@
   $("#q").addEventListener("keydown", function (e) { if (e.key === "Enter" && sample) askAI(); });
   $("#ask-btn").onclick = askAI;
   renderSearch(); renderWho(); renderProcess(); renderFees(); renderPlaybook(); initChecker(); route();
-  $("#foot").innerHTML = esc(D.meta.note) + " Rules last compiled " + esc(D.meta.asOf) + ". " + ALL.filter(function (e) { return !e.internal && e.status === "verified"; }).length + " entries verified against a primary source, " + ALL.filter(function (e) { return !e.internal && e.status !== "verified"; }).length + " awaiting verification.";
+  $("#foot").innerHTML = esc(D.meta.note) + " Rules last compiled " + esc(D.meta.asOf) + ". " + ALL.filter(function (e) { return !e.internal && e.status === "verified"; }).length + " entries verified against a primary source, " + ALL.filter(function (e) { return !e.internal && e.status === "web"; }).length + " read from the official web page, " + ALL.filter(function (e) { return !e.internal && e.status === "unverified"; }).length + " not yet verified.";
 
   if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; } catch (e) {} }
 
