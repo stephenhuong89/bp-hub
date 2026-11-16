@@ -5,8 +5,15 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  var ST = window.BPMODE === "st";
-  function mt(s) { return !ST ? s : String(s).replace(/building plan \(BP\) and architectural submissions/g, "structural plan (ST) submissions").replace(/building plan \(BP\)/g, "structural plan (ST)").replace(/building plan(?!s)/g, "structural plan").replace(/BP\/plan approval/g, "ST plan approval").replace(/\bBP\b/g, "ST").replace(/who manage the architect/g, "who manage the structural submission").replace(/([^_a-z])architect/g, "$1design engineer"); }
+  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", TAG = window.BPTAG || "BP";
+  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
+  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)" }[window.BPMODE || "bp"];
+  function mt(s) {
+    if (URA) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "URA planning permission (development control) submissions").replace(/building plan \(BP\)/g, "URA planning permission")
+      .replace(/building plan drawing set/g, "planning permission drawing set").replace(/BP\/plan approval/g, "URA written permission").replace(/TOP\/CSC/g, "the later BCA building plan stage")
+      .replace(/a BP submission needs/g, "a URA development application needs").replace(/standard BP sheet contents/g, "standard planning submission contents").replace(/\bBP\b/g, "URA");
+    return !ST ? s : String(s).replace(/building plan \(BP\) and architectural submissions/g, "structural plan (ST) submissions").replace(/building plan \(BP\)/g, "structural plan (ST)").replace(/building plan(?!s)/g, "structural plan").replace(/BP\/plan approval/g, "ST plan approval").replace(/\bBP\b/g, "ST").replace(/who manage the architect/g, "who manage the structural submission").replace(/([^_a-z])architect/g, "$1design engineer");
+  }
   function money(n) { return "S$" + Number(n).toLocaleString("en-SG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function srcLink(src, text) { return src ? '<a href="' + esc(src) + '" target="_blank" rel="noopener">' + esc(text || "Source") + "</a>" : ""; }
   function statusBadge(st) { return st === "verified" ? '<span class="badge ok">Verified</span>' : st === "web" ? '<span class="badge acc" title="Read from the official web page; spot-check table values">Official page</span>' : '<span class="badge warn">Unverified</span>'; }
@@ -505,12 +512,12 @@
     var sorted = f.slice().sort(function (a, b) { return (order[a.status] || 0) - (order[b.status] || 0); });
     var cta = '<div class="repcta pr-off"><div><b>Keep this report</b><span>It is stored in this browser only. Save the PDF to your computer or email it now.</span></div><button type="button" class="btn rep-pdf">Save as PDF</button><button type="button" class="btn rep-mail">Email report</button></div>';
     var o = rep.outlook || {}, html = '<div class="view">' +
-      '<div class="repbrand"><img src="logo.png" alt="CVC Engineers Pte Ltd" width="64" height="64"><div><b>CVC Engineers Pte Ltd</b><span>' + (window.BPMODE === "st" ? "Structural plan (ST)" : "Building plan (BP)") + ' drawing review</span></div></div>' + cta +
+      '<div class="repbrand"><img src="logo.png" alt="CVC Engineers Pte Ltd" width="64" height="64"><div><b>CVC Engineers Pte Ltd</b><span>' + BRAND + ' drawing review</span></div></div>' + cta +
       '<div class="view-head"><h2>Review result</h2><p class="small">' + esc((rv.facts.name || "Untitled project") + " · " + rv.sheets.length + " sheet(s) · " + new Date(rv.at).toLocaleString("en-SG")) + "</p></div>" +
       '<div class="note">This is a first-pass screen by an AI reading the sheets you selected. It can misread a dimension or miss one. A finding is not an authority decision and does not replace the QP\'s own check.</div>' +
       '<div class="kpis"><div class="kpi"><b style="color:var(--bad)">' + n.non_comply + '</b><span class="small">Not comply</span></div><div class="kpi"><b style="color:var(--warn)">' + n.unclear + '</b><span class="small">Cannot tell</span></div><div class="kpi"><b style="color:var(--ok)">' + n.comply + '</b><span class="small">Comply</span></div></div>' +
       '<div class="panel"><p>' + esc(rep.summary || "") + '</p><div class="grid">' +
-      ["bp", "top_csc"].map(function (k) { var x = o[k] || {}; return '<div><span class="label">' + (k === "bp" ? "Plan approval outlook" : "TOP / CSC outlook") + '</span><p><span class="badge ' + bandClass(x.band) + '">' + esc(x.band || "cannot assess") + "</span></p><p class=\"small\">" + esc(x.reason || "") + "</p></div>"; }).join("") + "</div></div>";
+      ["bp", "top_csc"].map(function (k) { var x = o[k] || {}; return '<div><span class="label">' + (k === "bp" ? OUTLOOK[0] : OUTLOOK[1]) + '</span><p><span class="badge ' + bandClass(x.band) + '">' + esc(x.band || "cannot assess") + "</span></p><p class=\"small\">" + esc(x.reason || "") + "</p></div>"; }).join("") + "</div></div>";
     if ((rep.hurdles || []).length) html += '<h3>Hurdles, most serious first</h3><div class="tw"><table><thead><tr><th>Agency</th><th>Issue</th><th>Severity</th></tr></thead><tbody>' + rep.hurdles.map(function (h) { return "<tr><td>" + esc(h.agency) + "</td><td>" + esc(h.issue) + '</td><td><span class="badge ' + (h.severity === "high" ? "bad" : h.severity === "medium" ? "warn" : "") + '">' + esc(h.severity) + "</span></td></tr>"; }).join("") + "</tbody></table></div>";
     html += '<h3>Findings by rule</h3><div class="list">' + (sorted.length ? sorted.map(function (x, i) {
       var r = RULE[x.rule_id], st = ST[x.status] || ST.unclear;
@@ -524,7 +531,7 @@
     if ((rep.questions_for_architect || []).length) html += '<h3>' + mt("Send to the architect") + '</h3><div class="panel">' + list(rep.questions_for_architect) + '<div class="row"><button type="button" class="btn ghost sm" id="copy-q">Copy as text</button></div></div>';
     var obs = []; (rv.perSheet || []).forEach(function (s) { (s.other_observations || []).forEach(function (t) { obs.push(s.name + ": " + t); }); (s.missing_on_sheet || []).forEach(function (t) { obs.push(s.name + ": missing " + t); }); if (s.error) obs.push(s.name + ": not reviewed. " + s.error); });
     if (obs.length) html += '<h3>Other observations per sheet</h3><div class="panel">' + list(obs) + "</div>";
-    $("#report").innerHTML = html + cta + '<p class="small repfoot">Prepared with the CVC ' + (window.BPMODE === "st" ? "ST" : "BP") + ' Submission Hub. First-pass AI screen of the sheets listed; not an authority decision and not a substitute for the qualified person\'s own check.</p></div>';
+    $("#report").innerHTML = html + cta + '<p class="small repfoot">Prepared with the CVC ' + TAG + ' Submission Hub. First-pass AI screen of the sheets listed; not an authority decision and not a substitute for the qualified person\'s own check.</p></div>';
     $$(".rep-pdf", $("#report")).forEach(function (b) { b.onclick = printReport; });
     $$(".rep-mail", $("#report")).forEach(function (b) { b.onclick = function () { mailReport(rv, n, sorted); }; });
     var cq = $("#copy-q"); if (cq) cq.onclick = function () {
@@ -561,11 +568,11 @@
   }
   saved = localReviews(); if (saved.length) renderSaved();
   function mailReport(rv, n, sorted) {
-    var rep = rv.report, o = rep.outlook || {}, tag = window.BPMODE === "st" ? "ST" : "BP", name = (rv.facts && rv.facts.name) || "Drawing set", L = [];
+    var rep = rv.report, o = rep.outlook || {}, tag = TAG, name = (rv.facts && rv.facts.name) || "Drawing set", L = [];
     var cut = function (s, k) { s = String(s || "").replace(/\s+/g, " "); return s.length > k ? s.slice(0, k - 1) + "\u2026" : s; };
     L.push(name + " - " + tag + " drawing review, " + new Date(rv.at).toLocaleDateString("en-SG"));
     L.push(rv.sheets.length + " sheet(s) reviewed. Not comply: " + n.non_comply + ". Cannot tell: " + n.unclear + ". Comply: " + n.comply + ".");
-    if (o.bp && o.bp.band) L.push("Plan approval outlook: " + o.bp.band + "."); if (o.top_csc && o.top_csc.band) L.push("TOP / CSC outlook: " + o.top_csc.band + ".");
+    if (o.bp && o.bp.band) L.push(OUTLOOK[0] + ": " + o.bp.band + "."); if (o.top_csc && o.top_csc.band) L.push(OUTLOOK[1] + ": " + o.top_csc.band + ".");
     if (rep.summary) L.push("", cut(rep.summary, 420));
     var bad = sorted.filter(function (x) { return x.status === "non_comply"; });
     if (bad.length) { L.push("", "Not comply:"); bad.slice(0, 6).forEach(function (x) { var r = RULE[x.rule_id]; L.push("- " + cut(r ? r.title : x.rule_id, 70) + (x.value_found ? " (read: " + cut(x.value_found, 40) + ")" : "")); }); if (bad.length > 6) L.push("- and " + (bad.length - 6) + " more in the PDF"); }
@@ -579,7 +586,7 @@
     var hid = [], el = $("#report"), old = document.title;
     for (var n = el; n && n !== document.body; n = n.parentNode) Array.prototype.forEach.call(n.parentNode.children, function (c) { if (c !== n && c.tagName !== "SCRIPT" && c.tagName !== "STYLE") { c.classList.add("pr-hide"); hid.push(c); } });
     document.documentElement.classList.add("print-report");
-    if (current) document.title = ((current.facts && current.facts.name) || "Drawing review") + " - " + (window.BPMODE === "st" ? "ST" : "BP") + " review " + new Date(current.at).toISOString().slice(0, 10);
+    if (current) document.title = ((current.facts && current.facts.name) || "Drawing review") + " - " + TAG + " review " + new Date(current.at).toISOString().slice(0, 10);
     var done = function () { hid.forEach(function (c) { c.classList.remove("pr-hide"); }); document.documentElement.classList.remove("print-report"); document.title = old; window.removeEventListener("afterprint", done); };
     window.addEventListener("afterprint", done); window.print(); setTimeout(done, 60000);
   }

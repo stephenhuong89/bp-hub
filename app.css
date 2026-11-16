@@ -516,3 +516,9 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 .keybox details { margin-top: 6px; } .keybox details summary { cursor: pointer; color: var(--ink-2); } .keybox details[open] summary { margin-bottom: 6px; }
 
 #report:not(:empty) + #report-ph { display: none; } #report-ph .btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* URA mode */
+[data-mode="ura"] .bp-only, [data-mode="ura"] .st-only, [data-mode="bp"] .ura-only, [data-mode="st"] .ura-only { display: none !important; }
+.chgrid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); } .chtile b { font-size: clamp(3.6rem, 9vw, 6.5rem); }
+.modesw button { padding: 8px 9px; font-size: .98rem; }
+.plot { fill: #EFE7DA; stroke: var(--ink); stroke-width: 2; } .dwg .bldg { fill: var(--line-2); stroke: var(--ink); stroke-width: 2; } .dwg .bldg.bad { fill: #F4C9CB; stroke: var(--bad); } .dwg .setb { fill: none; stroke: var(--bad); stroke-width: 2; stroke-dasharray: 6 5; } .dwg .road { fill: #C9CED2; }
