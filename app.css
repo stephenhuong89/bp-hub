@@ -479,3 +479,8 @@ footer { background: var(--ink); color: #B9C1C7; border: 0; }
 .dwg .lp:hover rect, .dwg .lp:hover path, .dwg .lp:focus rect, .dwg .lp:focus path { fill: #F4C9CB; } .dwg .lp.on rect, .dwg .lp.on path { fill: var(--bad); } .dwg .lp:focus { outline: none; } .dwg .flow { fill: none; stroke: var(--bad); stroke-width: 3; stroke-dasharray: 7 6; }
 .setrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr) auto; gap: 4px 16px; padding: 10px 12px; border-bottom: 1px solid var(--line); align-items: baseline; } .setrow b { font: 700 1.15rem/1.1 var(--f-head); text-transform: uppercase; } .setrow small { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-3); }
 @media (max-width: 700px) { .setrow { grid-template-columns: 1fr; } }
+/* hero: the headline keeps to its own half, the picture to the other */
+@media (min-width: 900px) { .hero { background-size: 50% auto; min-height: max(460px, 30vw); } .hero > *, .hero h1 { max-width: 47%; } .hero h1 { font-size: clamp(2.2rem, 3.9vw, 4.2rem); overflow-wrap: break-word; } }
+/* nav: never clip the first links; wrap to a second row when the bar is full */
+nav { justify-content: flex-start; } nav a { padding: 9px 10px; }
+@media (min-width: 701px) { nav { flex-wrap: wrap; overflow: visible; justify-content: flex-end; row-gap: 4px; } }
