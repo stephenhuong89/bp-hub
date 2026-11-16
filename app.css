@@ -527,3 +527,8 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 [data-mode="scdf"] .bp-only, [data-mode="scdf"] .st-only, [data-mode="scdf"] .ura-only, html:not([data-mode="scdf"]) .scdf-only { display: none !important; }
 .modesw button { padding: 8px 7px; font-size: .92rem; }
 .dwg .fire { fill: var(--bad); } .dwg .exitp { fill: none; stroke: var(--ok); stroke-width: 3; } .dwg .exitp.bad { stroke: var(--bad); }
+
+/* PUB mode */
+[data-mode="pub"] .bp-only, [data-mode="pub"] .st-only, [data-mode="pub"] .ura-only, html:not([data-mode="pub"]) .pub-only { display: none !important; }
+.modesw button { padding: 8px 6px; font-size: .88rem; }
+.dwg .water { fill: #BFD9EC; stroke: #2B6C9B; stroke-width: 1.5; } .dwg .pipe { fill: none; stroke: #2B6C9B; stroke-width: 5; } .dwg .zone.bad { fill: #F4C9CB; }

@@ -3,14 +3,15 @@
 (function () {
   "use strict";
   var saved = null; try { saved = localStorage.getItem("bp.mode"); } catch (e) {}
-  var SETS = { st: "ST", ura: "URA", scdf: "SCDF" };
+  var SETS = { st: "ST", ura: "URA", scdf: "SCDF", pub: "PUB" };
   var modes = ["bp"].concat(Object.keys(SETS).filter(function (m) { return !!window[SETS[m] + "DATA"]; }));
   var mode = modes.indexOf(saved) >= 0 ? saved : "bp";
   var NAMES = {
     bp: ["BP", "Building plan submission", "Architectural plans: fire escape, safety, accessibility, planning. For the team managing the architect."],
     st: ["ST", "Structural plan submission", "Structural plans, calculations, the accredited checker, piling, excavation and supervision. CVC's own submissions."],
     ura: ["URA", "Planning permission", "Use, plot ratio, height and setbacks under the Planning Act. The first approval, before any building plan."],
-    scdf: ["SCDF", "Fire safety submission", "Fire safety plans, minor A&A lodgment, the Registered Inspector and the Fire Safety Certificate."]
+    scdf: ["SCDF", "Fire safety submission", "Fire safety plans, minor A&A lodgment, the Registered Inspector and the Fire Safety Certificate."],
+    pub: ["PUB", "Drainage, sewerage and water", "Surface water drainage, earth control, sewerage and sanitary works, and water services. Civil submissions CVC signs itself."]
   };
   window.BPMODE = mode; window.BPTAG = NAMES[mode][0]; document.documentElement.setAttribute("data-mode", mode);
   if (mode !== "bp") {
@@ -74,7 +75,21 @@
     ["#v-check .view-head .lead", "Upload the fire safety plans. Each sheet is read against the Fire Code rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen."], ["#drop b", "Drop the fire safety plans here"],
     ["#v-playbook .view-head h2", "Managing a fire safety submission, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
   ];
-  var PLACE = { scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
+  TXT.pub = [
+    ['#nav a[href="#story"]', "Why PUB"], ['#nav a[href="#who"]', "Which submission"], ['#nav a[href="#playbook"]', "Managing the submission"],
+    ["#v-story .hero .label", "Why PUB clearance exists"], ["#v-story .hero h1", "Rain in. Used water out. Nothing muddy leaves the site."], ["#v-story .hero .lead", "Every site sits inside two public networks: the drains that carry storm water away and the sewers that carry used water to treatment. PUB's submissions protect both."],
+    ["#v-story > .grid .navcard:nth-child(1) b", "Learn the numbers"], ["#v-story > .grid .navcard:nth-child(1) span", "Platform level, runoff and sewer testers"], ["#v-story > .grid .navcard:nth-child(2) b", "Which submission"], ["#v-story > .grid .navcard:nth-child(2) span", "Drainage, earth control, sewerage, water"], ["#v-story > .grid .navcard:nth-child(4) span", "AI screen of a civil drawing"],
+    ["#v-guide .view-head h2", "Learn to read a site the way PUB does"], ["#v-guide .view-head .lead", "Platform levels, peak runoff, silt and sewer setbacks, each with a calculator."], ["#v-guide > h3", "Twelve numbers every PUB submission turns on"],
+    ["#v-guide > .grid .navcard:nth-child(1) b", "Which submission"], ["#v-guide > .grid .navcard:nth-child(1) span", "By type of works"], ["#v-guide > .grid .navcard:nth-child(4) span", "Upload civil drawings for an AI screen"],
+    ["#v-mistakes .view-head h2", "Why PUB submissions stall"], ["#v-mistakes .view-head .lead", "Where drainage, earth control and sewerage submissions and sites go wrong, from PUB's codes and its enforcement. Pick a stage."],
+    ["#v-search .view-head h2", "Search Singapore drainage, sewerage and water rules"],
+    ["#v-who .view-head h2", "Which submission: drainage, earth control, sewerage or water"], ["#v-who .view-head .lead", "Which works need which PUB clearance, and who must sign."],
+    ["#v-process .view-head h2", "From development control clearance to TOP"], ["#v-process .view-head .lead", "The PUB sequence: who acts, what goes in, what comes back, how long PUB takes, and what usually stalls it."],
+    ["#v-fees .view-head .lead", "PUB's charges for submissions and connections, from the published schedules. Earth control measures, CCTV surveys and testing are commercial costs outside this estimate."],
+    ["#v-check .view-head .lead", "Upload the civil drawings. Each sheet is read against the PUB rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen."], ["#drop b", "Drop the civil drawings here"],
+    ["#v-playbook .view-head h2", "Managing a PUB submission, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
+  ];
+  var PLACE = { pub: "Try: platform level, detention tank, silt, sewer setback, inspection chamber, grease trap", scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
   if (TXT[mode]) {
     TXT[mode].forEach(function (t) { var el = document.querySelector(t[0]); if (el) el.textContent = t[1]; });
     var qi = document.querySelector("#q"); if (qi) qi.placeholder = PLACE[mode];

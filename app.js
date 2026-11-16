@@ -5,10 +5,13 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", TAG = window.BPTAG || "BP";
-  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
-  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)" }[window.BPMODE || "bp"];
+  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", WATER = window.BPMODE === "pub", TAG = window.BPTAG || "BP";
+  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : window.BPMODE === "pub" ? ["PUB clearance outlook", "TOP / CSC outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
+  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)", pub: "Drainage, sewerage and water (PUB)" }[window.BPMODE || "bp"];
   function mt(s) {
+    if (WATER) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "PUB drainage, sewerage and water submissions").replace(/building plan \(BP\)/g, "PUB civil submission")
+      .replace(/building plan drawing set/g, "civil drawing set").replace(/BP\/plan approval/g, "PUB clearance")
+      .replace(/a BP submission needs/g, "a PUB submission needs").replace(/standard BP sheet contents/g, "standard civil drawing contents").replace(/\bBP\b/g, "PUB");
     if (FIRE) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "SCDF fire safety submissions").replace(/building plan \(BP\)/g, "SCDF fire safety plan")
       .replace(/building plan drawing set/g, "fire safety plan drawing set").replace(/BP\/plan approval/g, "SCDF fire safety plan approval").replace(/TOP\/CSC/g, "the Fire Safety Certificate")
       .replace(/a BP submission needs/g, "a fire safety plan submission needs").replace(/standard BP sheet contents/g, "standard fire safety plan contents").replace(/\bBP\b/g, "SCDF");
