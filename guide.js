@@ -4,7 +4,7 @@
   var A = window.BPAPP, $ = function (s, r) { return (r || document).querySelector(s); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function related(q, any) {
-    var r = (any ? A.search(q, [], []) : A.search(q, ["rule"], []).filter(function (e) { return e.checkable !== false; })).slice(0, 2);
+    var r = (any ? A.search(q, [], []) : A.search(q, ["rule"], []).filter(function (e) { return e.checkable !== false; })).slice(0, 1);
     return r.length ? '<span class="label">Rules in this hub</span><div class="list">' + r.map(A.entryHtml).join("") + '</div><a href="#search" data-q="' + esc(q) + '" class="jump">See every entry on this</a>'
       : '<p class="small">No rule entry in the hub covers this yet.</p>';
   }

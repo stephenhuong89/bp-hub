@@ -141,7 +141,7 @@
     $("#durbar").innerHTML = timed.map(function (s) { return '<i style="flex:' + s.tatMax + '" title="' + esc(s.title + ": " + (s.tatNote || "")) + '"></i>'; }).join("");
     $("#durtext").textContent = timed.length ? "If each stated step ran once, back to back: about " + lo + " to " + hi + " working days of authority time across " + timed.length + " timed steps. Several run in parallel in practice, and each resubmission restarts that step's clock." : "No stated processing times recorded for this track.";
     $("#steps").innerHTML = steps.map(function (s, i) {
-      return '<div class="step" data-id="' + s.id + '"><div class="rail"><span class="no">' + (i + 1) + '</span></div><details class="card"' + (i === 0 ? " open" : "") + "><summary><h3>" + esc(s.title) + '</h3><span class="badge acc">' + esc(s.agency) + "</span>" +
+      return '<div class="step" data-id="' + s.id + '"><div class="rail"><span class="no">' + (i + 1) + '</span></div><details class="card"><summary><h3>' + esc(s.title) + '</h3><span class="badge acc">' + esc(s.agency) + "</span>" +
         (s.tatNote ? '<span class="tat">' + esc(s.tatNote) + "</span>" : "") + statusBadge(s.status) + '</summary><div class="inner">' +
         '<div><span class="label">Who leads</span><p>' + esc(s.lead || "") + "</p></div>" +
         '<div><span class="label">What goes in</span>' + list(s.what) + "</div>" +

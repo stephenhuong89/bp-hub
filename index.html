@@ -57,6 +57,9 @@
       <div class="searchbar"><input type="search" id="g-q" placeholder="Or search the rules directly and press Enter" aria-label="Search the hub"></div>
     </div>
 
+    <h3>Twelve numbers every checker knows</h3>
+    <div class="numbers" id="g-numbers"></div>
+
     <h3>Spot the no-nos</h3>
     <p class="lead">This plan would be rejected for eight reasons. Find them.</p>
     <div class="viz"><div class="canvas" id="gm-plan"></div><div class="panel" id="gm-side"></div></div>
@@ -114,6 +117,7 @@
       <h2>Who can submit: architect or professional engineer</h2>
       <p class="lead">Which qualified person (QP) may prepare and submit which plans, and where a PE can act without an architect.</p>
     </div>
+    <div class="canvas" id="who-flow"></div>
     <div id="who-headline"></div>
     <div id="who-board"></div>
     <div class="panel">
@@ -137,11 +141,13 @@
     <div class="chips" id="track-chips" role="group" aria-label="Project type"></div>
     <div class="panel">
       <span class="label">Authority processing time on this track (working days, excludes design, resubmissions and construction)</span>
-      <div class="durbar" id="durbar"></div>
-      <div class="small" id="durtext"></div>
+      <div class="tw" style="border:0"><div id="p-gantt"></div></div><div class="durbar" id="durbar" hidden></div>
+      <div class="small" id="p-gantt-note"></div><div class="small" id="durtext" hidden></div>
     </div>
     <div class="panel"><span class="label">What CORENET X changed</span><div class="grid2" id="p-gates"></div><p class="srcline">BCA and URA describe the change as streamlining "over 20 approval touchpoints across seven regulatory agencies to three key gateways". The lines are illustrative. <a href="https://www.ura.gov.sg/guidelines/circulars/dc25-07/" target="_blank" rel="noopener">Joint circular, 10 Sep 2025</a></p></div>
     <div class="panel"><span class="label">Map of the steps by authority. Boxes in the same column run in parallel. Click a box to open it.</span><div class="tw" style="border:0"><div id="p-map"></div></div></div>
+    <div class="panel"><span class="label">Which clearances hold up moving in, and which hold up closing out</span><div class="clear" id="p-clear"></div><p class="srcline">Read from two official lists of which agency clears at which stage. BCA does not publish this as a rule, so confirm before telling a client.</p></div>
+    <h3>Every step in detail</h3>
     <div class="steps" id="steps"></div>
     <div id="process-notes" class="prose"></div>
   </section>
@@ -223,7 +229,7 @@
   <section class="view" id="v-playbook" hidden>
     <div class="view-head">
       <h2>Managing the architect</h2>
-      <p class="lead">What to ask for, what to check on receipt, and what to chase at each stage, written for the team coordinating the architect's submission work.</p>
+      <p class="lead">Pick the stage the job is at.</p>
     </div>
     <div id="playbook"></div>
   </section>
@@ -240,6 +246,7 @@
 <script src="guide.js"></script>
 <script src="viz.js"></script>
 <script src="game.js"></script>
+<script src="visuals.js"></script>
 <script src="whatif.js"></script>
 <script src="stats.js"></script>
 <script src="story.js"></script>
