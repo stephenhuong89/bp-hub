@@ -487,3 +487,5 @@ nav { justify-content: flex-start; } nav a { padding: 9px 10px; }
 /* nav: one row. Right-aligned when it fits; scrolls from the first link when it does not */
 @media (min-width: 701px) { nav { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: thin; } nav a:first-child { margin-left: auto; } nav a { padding: 9px 9px; font-size: .9rem; } .top .wrap { flex-wrap: nowrap; gap: 6px 14px; } }
 @media (min-width: 701px) and (max-width: 1320px) { nav a { padding: 9px 6px; font-size: .86rem; } nav { gap: 0; } a.brand span { font-size: 1.25rem; } }
+/* The drawing check is the main feature: its menu link is a solid red button in both modes */
+nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a[href="#check"][aria-current] { background: var(--bad); color: #fff; font-weight: 700; border-color: var(--bad); }
