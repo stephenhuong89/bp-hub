@@ -32,7 +32,7 @@
   }
   function quote(k) {
     var q = (S.quotes || {})[k]; if (!q) return "";
-    return '<figure class="quote">' + (q.lead ? '<span class="label">' + esc(q.lead) + "</span>" : "") + "<blockquote>" + (q.paraphrase ? "" : "\u201C") + esc(q.text) + (q.paraphrase ? "" : "\u201D") + (q.tail ? ' <span class="qtail">' + esc(q.tail) + "</span>" : "") + "</blockquote><figcaption>" + src(q.src, q.by) + "</figcaption></figure>";
+    return '<figure class="quote wide"><div class="qmain">' + (q.lead ? '<span class="label">' + esc(q.lead) + "</span>" : "") + "<blockquote>" + (q.paraphrase ? "" : "\u201C") + esc(q.text) + (q.paraphrase ? "" : "\u201D") + (q.tail ? ' <span class="qtail">' + esc(q.tail) + "</span>" : "") + "</blockquote><figcaption>" + src(q.src, q.by) + '</figcaption></div><div class="qside"><div class="qpic" data-pic="' + esc(q.pic || "check") + '"></div><b>' + esc(q.n || "") + "</b><span>" + esc(q.nl || "") + "</span></div></figure>";
   }
   var out = quote("hammurabi");
 
@@ -89,6 +89,7 @@
 
   out += quote("bca");
   $("#story").innerHTML = out;
+  if (window.BPPIC) Array.prototype.forEach.call(document.querySelectorAll("[data-pic]"), function (el) { el.innerHTML = window.BPPIC(el.getAttribute("data-pic")); });
 
   var dz = $("#dz");
   if (dz) {

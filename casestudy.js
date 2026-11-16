@@ -28,6 +28,7 @@
   };
   function pic(k) { return '<svg viewBox="0 0 160 110" class="dwg pic" aria-hidden="true">' + (P[k] || P.check) + "</svg>"; }
 
+  window.BPPIC = pic;
   var stage = 0, box = $("#playbook");
   function road() {
     var n = C.length, x = function (i) { return 62 + i * (776 / (n - 1)); }, y = function (i) { return i % 2 ? 128 : 84; }, d = "M" + x(0) + " " + y(0);
