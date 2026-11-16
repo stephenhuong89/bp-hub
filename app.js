@@ -90,15 +90,58 @@
 
   /* ---------- AI capability ---------- */
   var sample = null, db = null, lessons = [], aiReady = false;
+  var KEYNAME = "bp.apikey", MODEL = "claude-opus-5-5";
+  function apiKey() { try { return localStorage.getItem(KEYNAME) || ""; } catch (e) { return ""; } }
+  function aiOn() { return !!sample || !!apiKey(); }
+  function b64(blob) { return new Promise(function (res, rej) { var r = new FileReader(); r.onload = function () { res(String(r.result).split(",")[1]); }; r.onerror = rej; r.readAsDataURL(blob); }); }
+  function looseJson(t) {
+    try { return JSON.parse(t); } catch (e) {}
+    var f = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (f) { try { return JSON.parse(f[1]); } catch (e) {} }
+    var i = t.search(/[\[{]/), j = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]")); if (i >= 0 && j > i) { try { return JSON.parse(t.slice(i, j + 1)); } catch (e) {} }
+    throw { code: "invalid_json", text: t };
+  }
+  /* Direct call to the Claude Messages API from the browser. The key never leaves this browser except to api.anthropic.com. */
+  function apiCall(prompt, images, tier, signal) {
+    return Promise.all((images || []).map(b64)).then(function (datas) {
+      var content = datas.map(function (d) { return { type: "image", source: { type: "base64", media_type: "image/jpeg", data: d } }; });
+      content.push({ type: "text", text: prompt });
+      return fetch("https://api.anthropic.com/v1/messages", { method: "POST", signal: signal,
+        headers: { "content-type": "application/json", "x-api-key": apiKey(), "anthropic-version": "2023-06-01", "anthropic-beta": "server-side-fallback-2026-07-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({ model: MODEL, max_tokens: 16000, fallbacks: "default", output_config: { effort: tier === "complex" ? "high" : "medium" }, messages: [{ role: "user", content: content }] }) });
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok) throw { code: r.status === 401 || r.status === 403 ? "bad_key" : r.status === 429 ? "rate_limited" : r.status === 413 ? "prompt_too_large" : "upstream_error", message: (j.error && j.error.message) || ("HTTP " + r.status) };
+        if (j.stop_reason === "refusal") throw { code: "refused" };
+        var text = (j.content || []).filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("");
+        if (!text.trim()) throw { code: "empty_completion" };
+        return text;
+      });
+    }, function (e) { throw (e && e.name === "AbortError") ? { code: "cancelled" } : { code: "upstream_error", message: String(e && e.message || e) }; });
+  }
+  function aiJson(prompt, o) { return sample ? sample.json(prompt, { images: o.images, modelTier: o.tier, signal: o.signal, cache: false }) : apiCall(prompt, o.images, o.tier, o.signal).then(looseJson); }
+  function aiText(prompt, o) { return sample ? sample(prompt, { signal: o.signal, onText: o.onText }) : apiCall(prompt, null, "default", o.signal).then(function (t) { if (o.onText) o.onText({ text: t }); return { text: t }; }); }
+  function renderKeyBox() {
+    var box = $("#ai-off"), has = !!apiKey();
+    if (sample) { box.hidden = true; return; }
+    box.hidden = false; box.className = "keybox";
+    box.innerHTML = has
+      ? '<b>Claude is connected with an API key saved in this browser.</b><span>Drawings you check go from this browser straight to Anthropic under that key.</span><button type="button" class="btn ghost sm" id="key-clear">Remove the key</button>'
+      : '<b>Connect Claude to check drawings on this site</b><span>Paste an Anthropic API key. It is saved only in this browser and sent only to api.anthropic.com. Each check is billed to that key. On the claude.ai version of this hub no key is needed.</span><div class="row"><input type="password" id="key-in" placeholder="sk-ant-..." autocomplete="off" aria-label="Anthropic API key"><button type="button" class="btn sm" id="key-save">Connect</button></div>';
+    aiReady = has; maxImages = 7; $("#ask-btn").hidden = !has; renderThumbs();
+  }
+  document.addEventListener("click", function (e) {
+    if (e.target.id === "key-save") { var v = ($("#key-in").value || "").trim(); if (v) { try { localStorage.setItem(KEYNAME, v); } catch (x) {} renderKeyBox(); } }
+    if (e.target.id === "key-clear") { try { localStorage.removeItem(KEYNAME); } catch (x) {} renderKeyBox(); }
+  });
   function errCopy(e) {
     var c = e && e.code;
     return ({ not_granted: "Claude access was not allowed for this page, so AI features are off for this visit.", rate_limited: "Usage limit reached. Wait a while and try again.", session_expired: "Sign in to claude.ai again, then retry.",
       refused: "Claude declined this request. Change the input and try again.", invalid_json: "The reply could not be read as a structured result. Try again.", image_rejected: "A drawing image was rejected (too large or unreadable). Try a different file.",
-      images_unavailable: "This view cannot send images to Claude.", sampling_disabled: "Claude is not available for this account.", prompt_too_large: "Too much text for one request. Select fewer sheets.", cancelled: "Stopped." })[c] || "The request failed (" + (c || "unknown") + "). Try again.";
+      images_unavailable: "This view cannot send images to Claude.", sampling_disabled: "Claude is not available for this account.", prompt_too_large: "Too much text for one request. Select fewer sheets.", cancelled: "Stopped.", bad_key: "The API key was rejected. Check it and connect again.", empty_completion: "Claude returned nothing for this sheet. Try again." })[c] || "The request failed (" + (c || "unknown") + "). Try again.";
   }
   var askCtl = null;
   function askAI() {
-    var q = $("#q").value.trim(); if (!q || !sample) return;
+    var q = $("#q").value.trim(); if (!q || !aiOn()) return;
     var ctx = search(q, [], []).slice(0, 14);
     var out = $("#ask-out"); $("#ask-panel").hidden = false; out.textContent = "Thinking...";
     if (askCtl) askCtl.abort(); askCtl = new AbortController();
@@ -106,7 +149,7 @@
       "Use ONLY the hub entries below. Cite the entry id in square brackets after each claim. If the entries do not answer the question, say plainly that the hub does not cover it and name which authority to check. " +
       "If an entry is marked unverified, say so. Do not add rules, numbers or thresholds from memory. Answer in at most 180 words, plain text, no markdown.\n\nQUESTION: " + q + "\n\nHUB ENTRIES:\n" +
       ctx.map(function (e) { return "[" + e.id + "] (" + (e.agency || "") + ", " + (e.status || "") + ") " + e.title + ": " + e.body + (e.ref ? " Ref: " + e.ref : ""); }).join("\n");
-    sample(prompt, { signal: askCtl.signal, onText: function (u) { out.textContent = u.text; } })
+    aiText(prompt, { signal: askCtl.signal, onText: function (u) { out.textContent = u.text; } })
       .then(function (r) { out.textContent = r.text; })
       .catch(function (e) { if (e.code !== "cancelled") out.textContent = (e.text ? e.text + "\n\n" : "") + errCopy(e); });
   }
@@ -278,7 +321,7 @@
     $("#thumb-bar").hidden = !sheets.length;
     $("#sel-count").textContent = n + " of " + sheets.length + " sheets selected";
     $("#rv-run").disabled = !n || !aiReady || !!runCtl;
-    $("#rv-hint").textContent = !aiReady ? "AI review is not available in this view." : !n ? "Select at least one sheet." : n > 12 ? "That is a lot of sheets. Each one is a separate request on your Claude usage." : "Each sheet is one request, plus one to combine the results.";
+    $("#rv-hint").textContent = !aiReady ? "Connect Claude above to run the check." : !n ? "Select at least one sheet." : n > 12 ? "That is a lot of sheets. Each one is a separate request on your Claude usage." : "Each sheet is one request, plus one to combine the results.";
   }
   function rulesFor(scope) {
     return D.entries.filter(function (e) { return e.kind === "rule" && e.checkable !== false && (scope === "all" || e.scope === scope); });
@@ -311,7 +354,7 @@
       '"missing_information":[string],"hurdles":[{"agency":string,"issue":string,"severity":"high|medium|low"}],"outlook":{"bp":{"band":string,"reason":string},"top_csc":{"band":string,"reason":string}},"questions_for_architect":[string]}';
   }
   function runReview() {
-    var sel = sheets.filter(function (s) { return s.selected; }); if (!sel.length || !sample) return;
+    var sel = sheets.filter(function (s) { return s.selected; }); if (!sel.length || !aiOn()) return;
     var p = facts(), scope = $("#rv-scope").value, tier = $("#rv-depth").value, rules = rulesFor(scope);
     runCtl = new AbortController(); var signal = runCtl.signal;
     $("#rv-log").textContent = ""; $("#rv-run").disabled = true; $("#rv-stop").hidden = false; $("#report").innerHTML = "";
@@ -323,13 +366,13 @@
         log("Sheet " + (i + 1) + "/" + sel.length + ": " + s.name + " - rendering");
         return s.getCanvas().then(function (c) { return tileImages(c, maxImages); }).then(function (t) {
           log("  sending " + t.blobs.length + " image(s)" + (s.text ? " and " + Math.min(7000, s.text.length) + " characters of text" : "") + ", reading...");
-          return sample.json(sheetPrompt(s, p, rules, t.grid), { images: t.blobs, modelTier: tier, signal: signal, cache: false });
+          return aiJson(sheetPrompt(s, p, rules, t.grid), { images: t.blobs, tier: tier, signal: signal });
         }).then(function (r) {
           r = r || {}; r.name = s.name; r.findings = Array.isArray(r.findings) ? r.findings : []; per.push(r);
           log("  " + r.findings.length + " finding(s); legibility " + ((r.sheet && r.sheet.legibility) || "not stated"));
         }).catch(function (e) {
           if (e && e.code === "cancelled") throw e;
-          if (e && (e.code === "not_granted" || e.code === "rate_limited" || e.code === "sampling_disabled" || e.code === "session_expired")) throw e;
+          if (e && (e.code === "not_granted" || e.code === "rate_limited" || e.code === "sampling_disabled" || e.code === "session_expired" || e.code === "bad_key")) throw e;
           log("  could not review this sheet: " + errCopy(e)); per.push({ name: s.name, error: errCopy(e), findings: [] });
         });
       });
@@ -338,14 +381,15 @@
       if (signal.aborted) throw { code: "cancelled" };
       if (!per.some(function (x) { return !x.error; })) throw { code: "none", message: "No sheet could be reviewed." };
       log("Combining results...");
-      return sample.json(synthPrompt(p, per, rules), { modelTier: tier, signal: signal, cache: false });
+      return aiJson(synthPrompt(p, per, rules), { tier: tier, signal: signal });
     }).then(function (rep) {
       rep = rep || {}; rep.findings = Array.isArray(rep.findings) ? rep.findings : [];
       current = { id: "r" + Date.now(), at: new Date().toISOString(), facts: p, scope: scope, sheets: sel.map(function (s) { return s.name; }), report: rep, perSheet: per.map(function (x) { return { name: x.name, sheet: x.sheet, error: x.error, other_observations: x.other_observations, missing_on_sheet: x.missing_on_sheet }; }) };
       log("Done."); renderReport(current); saveReview(current);
     }).catch(function (e) {
       log(e && e.code === "none" ? e.message : errCopy(e));
-      if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) { aiReady = false; $("#ai-off").hidden = false; }
+      if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) { aiReady = false; sample = null; renderKeyBox(); }
+      if (e && e.code === "bad_key") renderKeyBox();
     }).then(function () { runCtl = null; $("#rv-stop").hidden = true; renderThumbs(); });
   }
   var RULE = {}; D.entries.forEach(function (e) { RULE[e.id] = e; });
@@ -444,7 +488,7 @@
   chips($("#kind-chips"), kindsPresent.map(function (k) { return { v: k, l: KIND[k] }; }), fKinds, renderSearch);
   chips($("#agency-chips"), agencies.map(function (a) { return { v: a, l: a }; }), fAgencies, renderSearch);
   $("#q").addEventListener("input", function () { $("#ask-panel").hidden = true; renderSearch(); });
-  $("#q").addEventListener("keydown", function (e) { if (e.key === "Enter" && sample) askAI(); });
+  $("#q").addEventListener("keydown", function (e) { if (e.key === "Enter" && aiOn()) askAI(); });
   $("#ask-btn").onclick = askAI;
   renderSearch(); renderWho(); renderProcess(); renderFees(); renderPlaybook(); initChecker(); route();
   $("#foot").innerHTML = esc(D.meta.note) + " Rules last compiled " + esc(D.meta.asOf) + ". " + ALL.filter(function (e) { return !e.internal && e.status === "verified"; }).length + " entries verified against a primary source, " + ALL.filter(function (e) { return !e.internal && e.status === "web"; }).length + " read from the official web page, " + ALL.filter(function (e) { return !e.internal && e.status === "unverified"; }).length + " not yet verified.";
@@ -454,11 +498,11 @@
   var C = window.claude;
   if (C && C.use) {
     C.use("sample").then(function (s) {
-      if (!s) { $("#ai-off").hidden = false; return; }
+      if (!s) { renderKeyBox(); return; }
       sample = s; $("#ask-btn").hidden = false;
       return s.limits().catch(function () { return null; }).then(function (lim) {
         maxImages = lim && lim.images ? lim.images.maxCount : 0;
-        aiReady = maxImages > 0; if (!aiReady) $("#ai-off").hidden = false; renderThumbs();
+        aiReady = maxImages > 0; if (!aiReady) { sample = null; renderKeyBox(); } else { $("#ai-off").hidden = true; } renderThumbs();
       });
     });
     C.use("db").then(function (d) {
@@ -466,5 +510,5 @@
       d.collection("lessons").orderBy("at", "desc").limit(60).onSnapshot(function (snap) { lessons = snap.docs.map(function (x) { return x.data(); }); renderLessons(); }, function () {});
       d.collection("reviews").orderBy("at", "desc").limit(30).onSnapshot(function (snap) { saved = snap.docs.map(function (x) { return x.data(); }); renderSaved(); }, function () {});
     });
-  } else { $("#ai-off").hidden = false; }
+  } else { renderKeyBox(); }
 })();

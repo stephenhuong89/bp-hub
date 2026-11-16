@@ -409,3 +409,19 @@ input[type=text], input[type=number], input[type=search], select, textarea { bor
 footer { background: var(--ink); color: #B9C1C7; border: 0; }
 .tile b { font-size: clamp(2.4rem, 4.4vw, 3.8rem); white-space: nowrap; } .tile.na b { white-space: normal; }
 @media (max-width: 700px) { .costs { margin-inline: -16px; padding: 18px 16px; } .case { padding: 16px; } .quote.wide { padding: 22px 18px; } .tiles { padding: 20px 16px; } nav { justify-content: flex-start; } }
+/* form fields line up along the bottom when labels wrap */
+.grid { align-items: end; } #fee-form, #facts-form { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); } .field > span { line-height: 1.3; }
+
+/* drawing check: the upload is the page */
+.drop { background: var(--ink); color: #fff; border: 4px dashed var(--bad); padding: 44px 20px; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.drop b { font-family: var(--f-head); font-size: clamp(1.8rem, 4.4vw, 3.2rem); line-height: 1; text-transform: uppercase; } .drop .dsub { font-size: 1.1rem; } .drop .small { color: #B9C1C7; }
+.drop svg { color: var(--bad); } .drop:hover, .drop.over { background: var(--bad); border-color: #fff; } .drop:hover svg, .drop.over svg { color: #fff; } .drop:focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
+.keybox { background: var(--sheet); border: 2px solid var(--ink); border-left: 10px solid var(--bad); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; } .keybox b { font-family: var(--f-head); font-size: 1.5rem; text-transform: uppercase; line-height: 1.05; }
+.keybox .row input { flex: 1 1 280px; max-width: 520px; } .keybox span { color: var(--ink-2); max-width: 80ch; }
+#rv-run { font-size: 1.15rem; padding: 14px 26px; }
+
+/* stage strip (replaces the drawn road) */
+.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 6px; background: var(--ink); padding: 14px; }
+.strip .stn { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; text-align: left; padding: 12px 12px 14px; min-height: 44px; background: #1E2830; color: #fff; border: 0; border-top: 5px solid #47535E; cursor: pointer; font: inherit; }
+.strip .stn b { font-family: var(--f-head); font-size: 2.2rem; line-height: 1; } .strip .stn span { font-weight: 600; font-size: .92rem; } .strip .stn small { font-size: .76rem; color: #D5DADE; }
+.strip .stn.done { border-top-color: var(--ok); } .strip .stn.on, .strip .stn:hover { background: var(--bad); border-top-color: #fff; } .mo .strip .stn.on { animation: none; }

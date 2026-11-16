@@ -173,19 +173,12 @@
       <p class="lead">Upload the architect's drawings. Each sheet is read against the rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen.</p>
     </div>
     <figure class="quote sm"><blockquote>“act with prime regard to public safety and interests”</blockquote><figcaption><a href="https://www1.peb.gov.sg/about-us/pe-pledge/" target="_blank" rel="noopener">The Professional Engineer’s Pledge, Professional Engineers Board Singapore</a>. Every drawing you check here is that promise being kept.</figcaption></figure>
-    <div class="note" id="ai-off" hidden>AI review is not available in this view. Open the hub from its claude.ai link while signed in, and allow it to use Claude when asked. Search, process, fees and the pathway pre-check below work without it.</div>
+    <div class="keybox" id="ai-off" hidden></div>
 
     <div class="panel">
-      <h3>1. Project facts</h3>
-      <div class="grid" id="facts-form"></div>
-      <label class="field"><span>Anything the reviewer should know (site constraints, client brief, known waivers)</span><textarea id="f-notes"></textarea></label>
-      <div id="pathway"></div>
-    </div>
-
-    <div class="panel">
-      <h3>2. Drawings</h3>
+      <h3>1. Drop the drawings</h3>
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose drawing files">
-        <b>Drop PDF, PNG or JPG drawings here, or click to choose</b>
+        <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><path d="M32 44 V14 M20 26 l12 -12 l12 12 M10 44 v8 h44 v-8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="square"/></svg><b>Drop the architect's drawings here</b><span class="dsub">PDF, PNG or JPG. Or click to choose files.</span>
         <div class="small">Files are read in your browser. Only the sheets you select are sent to Claude for review.</div>
       </div>
       <input type="file" id="file" accept="application/pdf,image/png,image/jpeg" multiple hidden>
@@ -196,6 +189,13 @@
         <button class="btn ghost sm" id="files-clear" type="button">Remove files</button>
       </div>
       <div class="thumbs" id="thumbs"></div>
+    </div>
+
+    <div class="panel">
+      <h3>2. Tell the checker about the project (optional, improves the result)</h3>
+      <div class="grid" id="facts-form"></div>
+      <label class="field"><span>Anything the reviewer should know (site constraints, client brief, known waivers)</span><textarea id="f-notes"></textarea></label>
+      <div id="pathway"></div>
     </div>
 
     <div class="panel">
