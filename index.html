@@ -39,7 +39,7 @@
       <h1>Every building you walk into was checked before it was built.</h1>
       <p class="lead">Switch the checks off, one authority at a time, and watch the same street.</p>
     </div>
-    <div class="wi">
+    <div class="wi bp-only">
       <div class="canvas" id="wi-scene"></div>
       <div class="wi-side"><div id="wi-count" class="wi-count"></div><div id="wi-switches" class="switches"></div><button type="button" class="btn" id="wi-all"></button></div>
     </div>
@@ -63,6 +63,8 @@
     <h3>Twelve numbers every checker knows</h3>
     <div class="numbers" id="g-numbers"></div>
 
+    <div class="st-only wrapc" id="st-learn"></div>
+    <div class="bp-only wrapc">
     <h3>Spot the no-nos</h3>
     <p class="lead">This plan would be rejected for eight reasons. Find them.</p>
     <div class="viz"><div class="canvas" id="gm-plan"></div><div class="panel" id="gm-side"></div></div>
@@ -84,6 +86,7 @@
     <div class="sheets" id="g-sheets"></div>
     <div id="g-sheet-out"></div>
 
+    </div>
     <h3>5. Where to go next</h3>
     <div class="grid">
       <a class="navcard" href="#who"><b>Who can submit</b><span>Architect or PE, by type of project</span></a>
@@ -102,12 +105,14 @@
     <div class="strip" id="mk-tabs" role="tablist" aria-label="Authority"></div>
     <div class="mklist" id="mk-list"></div>
     <p class="srcline" id="mk-src"></p>
+    <div class="bp-only wrapc">
     <div class="view-head">
       <h2>Subpar against good</h2>
       <p class="lead">The same floor plan drawn twice. One gives the checker nothing to check. The other shows what the Regulations require on every plan.</p>
     </div>
     <div class="viz"><div id="cmp"></div><div class="chks" id="cmp-req"></div></div>
     <p class="srcline">Neither sheet is a real project. No authority publishes how often submissions draw written directions or how many rounds they take; only URA's figure that about 60% of CAD and BIM files are misnamed could be found.</p>
+    </div>
   </section>
 
   <!-- QUIZ -->
@@ -146,7 +151,7 @@
       <h2>Who can submit: architect or professional engineer</h2>
       <p class="lead">Which qualified person (QP) may prepare and submit which plans, and where a PE can act without an architect.</p>
     </div>
-    <div class="canvas" id="who-flow"></div>
+    <div class="canvas bp-only" id="who-flow"></div>
     <div id="who-headline"></div>
     <div id="who-board"></div>
     <div class="panel">
@@ -173,9 +178,9 @@
       <div class="tw" style="border:0"><div id="p-gantt"></div></div><div class="durbar" id="durbar" hidden></div>
       <div class="small" id="p-gantt-note"></div><div class="small" id="durtext" hidden></div>
     </div>
-    <div class="panel"><span class="label">What CORENET X changed</span><div class="grid2" id="p-gates"></div><p class="srcline">BCA and URA describe the change as streamlining "over 20 approval touchpoints across seven regulatory agencies to three key gateways". The lines are illustrative. <a href="https://www.ura.gov.sg/guidelines/circulars/dc25-07/" target="_blank" rel="noopener">Joint circular, 10 Sep 2025</a></p></div>
+    <div class="panel bp-only"><span class="label">What CORENET X changed</span><div class="grid2" id="p-gates"></div><p class="srcline">BCA and URA describe the change as streamlining "over 20 approval touchpoints across seven regulatory agencies to three key gateways". The lines are illustrative. <a href="https://www.ura.gov.sg/guidelines/circulars/dc25-07/" target="_blank" rel="noopener">Joint circular, 10 Sep 2025</a></p></div>
     <div class="panel"><span class="label">Map of the steps by authority. Boxes in the same column run in parallel. Click a box to open it.</span><div class="tw" style="border:0"><div id="p-map"></div></div></div>
-    <div class="panel"><span class="label">Which clearances hold up moving in, and which hold up closing out</span><div class="clear" id="p-clear"></div><p class="srcline">Read from two official lists of which agency clears at which stage. BCA does not publish this as a rule, so confirm before telling a client.</p></div>
+    <div class="panel bp-only"><span class="label">Which clearances hold up moving in, and which hold up closing out</span><div class="clear" id="p-clear"></div><p class="srcline">Read from two official lists of which agency clears at which stage. BCA does not publish this as a rule, so confirm before telling a client.</p></div>
     <h3>Every step in detail</h3>
     <div class="steps" id="steps"></div>
     <div id="process-notes" class="prose"></div>
@@ -272,6 +277,7 @@
 <script src="rules.js"></script>
 <script src="stats.js"></script>
 <script src="cases.js"></script>
+<script src="st-data.js"></script>
 <script src="mode.js"></script>
 <script src="app.js"></script>
 <script src="examples.js"></script>
@@ -286,6 +292,7 @@
 <script src="motion.js"></script>
 <script src="whatif.js"></script>
 <script src="story.js"></script>
+<script src="st-learn.js"></script>
 <!--ARTIFACT-BODY-END-->
 </body>
 </html>

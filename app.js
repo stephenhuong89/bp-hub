@@ -5,6 +5,8 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  var ST = window.BPMODE === "st";
+  function mt(s) { return !ST ? s : String(s).replace(/building plan \(BP\) and architectural submissions/g, "structural plan (ST) submissions").replace(/building plan \(BP\)/g, "structural plan (ST)").replace(/building plan(?!s)/g, "structural plan").replace(/BP\/plan approval/g, "ST plan approval").replace(/\bBP\b/g, "ST").replace(/who manage the architect/g, "who manage the structural submission").replace(/([^_a-z])architect/g, "$1design engineer"); }
   function money(n) { return "S$" + Number(n).toLocaleString("en-SG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function srcLink(src, text) { return src ? '<a href="' + esc(src) + '" target="_blank" rel="noopener">' + esc(text || "Source") + "</a>" : ""; }
   function statusBadge(st) { return st === "verified" ? '<span class="badge ok">Verified</span>' : st === "web" ? '<span class="badge acc" title="Read from the official web page; spot-check table values">Official page</span>' : '<span class="badge warn">Unverified</span>'; }
@@ -145,7 +147,7 @@
     var ctx = search(q, [], []).slice(0, 14);
     var out = $("#ask-out"); $("#ask-panel").hidden = false; out.textContent = "Thinking...";
     if (askCtl) askCtl.abort(); askCtl = new AbortController();
-    var prompt = "You answer questions for staff of a Singapore civil and structural engineering firm about building plan (BP) and architectural submissions.\n" +
+    var prompt = mt("You answer questions for staff of a Singapore civil and structural engineering firm about building plan (BP) and architectural submissions.\n") +
       "Use ONLY the hub entries below. Cite the entry id in square brackets after each claim. If the entries do not answer the question, say plainly that the hub does not cover it and name which authority to check. " +
       "If an entry is marked unverified, say so. Do not add rules, numbers or thresholds from memory. Answer in at most 180 words, plain text, no markdown.\n\nQUESTION: " + q + "\n\nHUB ENTRIES:\n" +
       ctx.map(function (e) { return "[" + e.id + "] (" + (e.agency || "") + ", " + (e.status || "") + ") " + e.title + ": " + e.body + (e.ref ? " Ref: " + e.ref : ""); }).join("\n");
@@ -157,7 +159,7 @@
   /* ---------- WHO ---------- */
   var VERDICT = { pe: ["ok", "PE can submit"], architect: ["bad", "Architect required"], either: ["ok", "Architect or PE"], depends: ["warn", "Depends"], none: ["acc", "No submission"] };
   function whoResult(o) {
-    var v = VERDICT[o.verdict] || VERDICT.depends;
+    var v = VERDICT[o.verdict] || VERDICT.depends; if (o.vlabel) v = [v[0], o.vlabel];
     return '<div class="finding ' + (o.verdict === "architect" ? "non_comply" : o.verdict === "depends" ? "unclear" : "comply") + '"><div class="hd"><b>' + esc(o.qp) + '</b><span class="badge ' + v[0] + '">' + v[1] + '</span><span class="badge">Confidence: ' + esc(o.confidence) + "</span></div><p>" + esc(o.basis) + "</p>" +
       (o.detail ? "<p>" + esc(o.detail) + "</p>" : "") + '<div class="row"><span class="ref">' + esc(o.ref || "") + "</span>" + srcLink(o.src) + "</div></div>";
   }
@@ -169,7 +171,7 @@
     var show = function () { var o = D.who.options.filter(function (x) { return x.id === sel.value; })[0]; $("#who-result").innerHTML = whoResult(o); };
     sel.onchange = show; show();
     $("#who-table").innerHTML = "<thead><tr><th>Work</th><th>Who can be QP</th><th>Verdict</th><th>Confidence</th><th>Basis</th></tr></thead><tbody>" +
-      D.who.options.map(function (o) { var v = VERDICT[o.verdict] || VERDICT.depends; return "<tr><td>" + esc(o.label) + "</td><td>" + esc(o.qp) + '</td><td><span class="badge ' + v[0] + '">' + v[1] + "</span></td><td>" + esc(o.confidence) + '</td><td><span class="ref mono">' + esc(o.ref || "") + "</span> " + srcLink(o.src) + "</td></tr>"; }).join("") + "</tbody>";
+      D.who.options.map(function (o) { var v = VERDICT[o.verdict] || VERDICT.depends; if (o.vlabel) v = [v[0], o.vlabel]; return "<tr><td>" + esc(o.label) + "</td><td>" + esc(o.qp) + '</td><td><span class="badge ' + v[0] + '">' + v[1] + "</span></td><td>" + esc(o.confidence) + '</td><td><span class="ref mono">' + esc(o.ref || "") + "</span> " + srcLink(o.src) + "</td></tr>"; }).join("") + "</tbody>";
   }
 
   /* ---------- PROCESS ---------- */
@@ -190,7 +192,7 @@
         '<div><span class="label">What goes in</span>' + list(s.what) + "</div>" +
         '<div><span class="label">What comes back</span>' + list(s.out) + "</div>" +
         '<div><span class="label">Usual hurdles</span>' + list(s.hurdles) + "</div>" +
-        '<div><span class="label">Ask the architect</span>' + list(s.ask) + "</div>" +
+        '<div><span class="label">' + mt("Ask the architect") + '</span>' + list(s.ask) + "</div>" +
         '<div><span class="label">Reference</span><p class="ref mono">' + esc(s.ref || "") + "</p>" + srcLink(s.src) + "</div></div></details></div>";
     }).join("");
     $("#process-notes").innerHTML = D.processNotesHtml || "";
@@ -366,7 +368,7 @@
         log("Sheet " + (i + 1) + "/" + sel.length + ": " + s.name + " - rendering");
         return s.getCanvas().then(function (c) { return tileImages(c, maxImages); }).then(function (t) {
           log("  sending " + t.blobs.length + " image(s)" + (s.text ? " and " + Math.min(7000, s.text.length) + " characters of text" : "") + ", reading...");
-          return aiJson(sheetPrompt(s, p, rules, t.grid), { images: t.blobs, tier: tier, signal: signal });
+          return aiJson(mt(sheetPrompt(s, p, rules, t.grid)), { images: t.blobs, tier: tier, signal: signal });
         }).then(function (r) {
           r = r || {}; r.name = s.name; r.findings = Array.isArray(r.findings) ? r.findings : []; per.push(r);
           log("  " + r.findings.length + " finding(s); legibility " + ((r.sheet && r.sheet.legibility) || "not stated"));
@@ -381,7 +383,7 @@
       if (signal.aborted) throw { code: "cancelled" };
       if (!per.some(function (x) { return !x.error; })) throw { code: "none", message: "No sheet could be reviewed." };
       log("Combining results...");
-      return aiJson(synthPrompt(p, per, rules), { tier: tier, signal: signal });
+      return aiJson(mt(synthPrompt(p, per, rules)), { tier: tier, signal: signal });
     }).then(function (rep) {
       rep = rep || {}; rep.findings = Array.isArray(rep.findings) ? rep.findings : [];
       current = { id: "r" + Date.now(), at: new Date().toISOString(), facts: p, scope: scope, sheets: sel.map(function (s) { return s.name; }), report: rep, perSheet: per.map(function (x) { return { name: x.name, sheet: x.sheet, error: x.error, other_observations: x.other_observations, missing_on_sheet: x.missing_on_sheet }; }) };
@@ -416,7 +418,7 @@
         '<div class="fb" data-i="' + i + '" data-rule="' + esc(x.rule_id) + '" data-said="' + esc(x.status) + '"><span class="small">Was the checker right?</span><button type="button" class="btn ghost sm" data-fb="1">Right</button><button type="button" class="btn ghost sm" data-fb="0">Wrong</button><input type="text" id="fbn-' + i + '" placeholder="What should it have said? (optional)" aria-label="Correction note"></div></div>';
     }).join("") : '<div class="panel">No rule in the selected set could be assessed from these sheets.</div>') + "</div>";
     if ((rep.missing_information || []).length) html += '<h3>Missing from the set</h3><div class="panel">' + list(rep.missing_information) + "</div>";
-    if ((rep.questions_for_architect || []).length) html += '<h3>Send to the architect</h3><div class="panel">' + list(rep.questions_for_architect) + '<div class="row"><button type="button" class="btn ghost sm" id="copy-q">Copy as text</button></div></div>';
+    if ((rep.questions_for_architect || []).length) html += '<h3>' + mt("Send to the architect") + '</h3><div class="panel">' + list(rep.questions_for_architect) + '<div class="row"><button type="button" class="btn ghost sm" id="copy-q">Copy as text</button></div></div>';
     var obs = []; (rv.perSheet || []).forEach(function (s) { (s.other_observations || []).forEach(function (t) { obs.push(s.name + ": " + t); }); (s.missing_on_sheet || []).forEach(function (t) { obs.push(s.name + ": missing " + t); }); if (s.error) obs.push(s.name + ": not reviewed. " + s.error); });
     if (obs.length) html += '<h3>Other observations per sheet</h3><div class="panel">' + list(obs) + "</div>";
     $("#report").innerHTML = html + "</div>";

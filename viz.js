@@ -114,10 +114,10 @@
 
   /* ---------- Who board ---------- */
   function whoBoard() {
-    var G = [["pe", "PE only", "Part I of the Third Schedule"], ["either", "PE or architect", "Part II of the Third Schedule"], ["architect", "Architect for building plans", "Everything else"]];
-    var bca = D.who.options.filter(function (o) { return !o.agency && ["pe", "either", "architect"].indexOf(o.verdict) >= 0 && !/Structural|Lightning|stability/i.test(o.label); });
+    var G = D.who.buckets || [["pe", "PE only", "Part I of the Third Schedule"], ["either", "PE or architect", "Part II of the Third Schedule"], ["architect", "Architect for building plans", "Everything else"]];
+    var bca = D.who.options.filter(function (o) { return !o.agency && ["pe", "either", "architect"].indexOf(o.verdict) >= 0 && (D.who.buckets || !/Structural|Lightning|stability/i.test(o.label)); });
     $("#who-board").innerHTML = '<div class="board">' + G.map(function (g) {
-      return '<div class="bucket b-' + g[0] + '"><h3>' + g[1] + '</h3><span class="label">' + g[2] + '</span><div class="chips">' + bca.filter(function (o) { return o.verdict === g[0]; }).map(function (o) { return '<button type="button" class="chip" data-id="' + o.id + '">' + esc(o.label) + "</button>"; }).join("") + "</div></div>"; }).join("") + '</div><p class="small">Structural plans are by a PE in every column. Click a project type to see the clause.</p>';
+      return '<div class="bucket b-' + g[0] + '"><h3>' + g[1] + '</h3><span class="label">' + g[2] + '</span><div class="chips">' + bca.filter(function (o) { return o.verdict === g[0]; }).map(function (o) { return '<button type="button" class="chip" data-id="' + o.id + '">' + esc(o.label) + "</button>"; }).join("") + "</div></div>"; }).join("") + '</div><p class="small">' + (D.who.buckets ? "" : "Structural plans are by a PE in every column. ") + 'Click a project type to see the clause.</p>';
   }
   $("#who-board").addEventListener("click", function (e) { var b = e.target.closest(".chip"); if (!b) return; var sel = $("#who-sel"); sel.value = b.dataset.id; sel.dispatchEvent(new Event("change")); $("#who-result").scrollIntoView({ behavior: "smooth", block: "center" }); });
   whoBoard();

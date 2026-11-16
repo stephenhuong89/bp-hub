@@ -464,3 +464,18 @@ footer { background: var(--ink); color: #B9C1C7; border: 0; }
 .chtile { text-align: left; background: #fff; color: var(--ink); border: 0; border-top: 10px solid var(--bad); padding: 26px; cursor: pointer; display: flex; flex-direction: column; gap: 8px; font: inherit; min-height: 260px; }
 .chtile b { font: 700 clamp(4.5rem, 12vw, 8rem)/.85 var(--f-head); color: var(--bad); } .chtile strong { font: 700 1.7rem/1 var(--f-head); text-transform: uppercase; } .chtile span { color: var(--ink-2); font-size: 1.02rem; }
 .chtile:hover, .chtile:focus-visible { background: var(--bad); color: #fff; } .chtile:hover b, .chtile:hover span, .chtile:focus-visible b, .chtile:focus-visible span { color: #fff; }
+
+/* ST mode */
+.wrapc { display: contents; }
+[data-mode="st"] .bp-only, [data-mode="bp"] .st-only { display: none !important; }
+[data-mode="st"] .hero { background-image: url(img/st-hero.jpg); }
+[data-mode="st"] #v-guide { --bn: url(img/st-learn.jpg); } [data-mode="st"] #v-mistakes { --bn: url(img/st-mistakes.jpg); } [data-mode="st"] #v-who { --bn: url(img/st-who.jpg); } [data-mode="st"] #v-process { --bn: url(img/st-process.jpg); }
+.roles { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.role { border: 2px solid var(--line); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; color: var(--ink-3); background: var(--sheet); } .role b { font: 700 1.25rem/1.05 var(--f-head); text-transform: uppercase; } .role span { font-size: .85rem; }
+.role.on { border-color: var(--ink); color: var(--ink); border-top: 8px solid var(--bad); } .role.on b { color: var(--bad); }
+.bigs { display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); background: var(--ink); padding: 18px; column-gap: 18px; row-gap: 18px; }
+.bigs div { border-top: 4px solid var(--bad); padding-top: 8px; color: #fff; display: flex; flex-direction: column; gap: 2px; } .bigs b { font: 700 clamp(2.4rem, 5vw, 3.6rem)/.95 var(--f-head); } .bigs span { font-size: .9rem; } .bigs small { color: #B9C1C7; font-size: .72rem; font-family: var(--f-mono); }
+.dwg .soil { fill: #EFE7DA; } .dwg .wallx { stroke: var(--ink); stroke-width: 7; } .dwg .defl { fill: none; stroke: var(--bad); stroke-width: 3; } .dwg .lp { cursor: pointer; } .dwg .lp rect, .dwg .lp path { fill: var(--line-2); stroke: var(--ink); stroke-width: 2; transition: fill .15s; }
+.dwg .lp:hover rect, .dwg .lp:hover path, .dwg .lp:focus rect, .dwg .lp:focus path { fill: #F4C9CB; } .dwg .lp.on rect, .dwg .lp.on path { fill: var(--bad); } .dwg .lp:focus { outline: none; } .dwg .flow { fill: none; stroke: var(--bad); stroke-width: 3; stroke-dasharray: 7 6; }
+.setrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr) auto; gap: 4px 16px; padding: 10px 12px; border-bottom: 1px solid var(--line); align-items: baseline; } .setrow b { font: 700 1.15rem/1.1 var(--f-head); text-transform: uppercase; } .setrow small { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-3); }
+@media (max-width: 700px) { .setrow { grid-template-columns: 1fr; } }
