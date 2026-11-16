@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<!--ARTIFACT-BODY-START-->
+<title>CVC BP Submission Hub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<link rel="stylesheet" href="app.css">
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">CVC <span>BP Submission Hub</span></div>
+    <nav id="nav" aria-label="Sections">
+      <a href="#search">Search</a>
+      <a href="#who">Who can submit</a>
+      <a href="#process">Process</a>
+      <a href="#fees">Fees</a>
+      <a href="#check">Drawing check</a>
+      <a href="#playbook">Managing the architect</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- SEARCH -->
+  <section class="view" id="v-search">
+    <div class="view-head">
+      <h2>Search Singapore building plan submission rules</h2>
+      <p class="lead">Every rule, process step, fee, role and hurdle in this hub is one searchable entry with its clause reference and source. Entries marked unverified have not been confirmed against the primary document yet.</p>
+    </div>
+    <div class="searchbar">
+      <input type="search" id="q" placeholder="Try: staircase riser, PE submit, CSC, travel distance, GFA, household shelter" autocomplete="off" aria-label="Search the hub">
+      <button class="btn" id="ask-btn" type="button" hidden>Ask AI</button>
+    </div>
+    <div class="chips" id="kind-chips" role="group" aria-label="Filter by type"></div>
+    <div class="chips" id="agency-chips" role="group" aria-label="Filter by agency"></div>
+    <div class="panel" id="ask-panel" hidden>
+      <span class="label">AI answer from hub entries</span>
+      <div class="answer" id="ask-out"></div>
+      <p class="small">The answer uses only the entries matched below. Check the cited entry and its source before relying on it.</p>
+    </div>
+    <div class="count" id="count"></div>
+    <div class="list" id="results"></div>
+  </section>
+
+  <!-- WHO -->
+  <section class="view" id="v-who" hidden>
+    <div class="view-head">
+      <h2>Who can submit: architect or professional engineer</h2>
+      <p class="lead">Which qualified person (QP) may prepare and submit which plans, and where a PE can act without an architect.</p>
+    </div>
+    <div id="who-headline"></div>
+    <div class="panel">
+      <h3>Check a job</h3>
+      <div class="grid">
+        <label class="field"><span>Type of work</span><select id="who-sel"></select></label>
+      </div>
+      <div id="who-result"></div>
+    </div>
+    <h3>Full matrix</h3>
+    <div class="tw"><table id="who-table"></table></div>
+    <div id="who-notes" class="prose"></div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="view" id="v-process" hidden>
+    <div class="view-head">
+      <h2>From design-ready to occupation, step by step</h2>
+      <p class="lead">The regulatory sequence once the design is ready: who acts, what goes in, what comes back, how long the authority takes, and what usually stalls it.</p>
+    </div>
+    <div class="chips" id="track-chips" role="group" aria-label="Project type"></div>
+    <div class="panel">
+      <span class="label">Authority processing time on this track (working days, excludes design, resubmissions and construction)</span>
+      <div class="durbar" id="durbar"></div>
+      <div class="small" id="durtext"></div>
+    </div>
+    <div class="steps" id="steps"></div>
+    <div id="process-notes" class="prose"></div>
+  </section>
+
+  <!-- FEES -->
+  <section class="view" id="v-fees" hidden>
+    <div class="view-head">
+      <h2>Authority processing fee estimate</h2>
+      <p class="lead">Statutory plan and processing fees computed from the published schedules. Consultant fees, land betterment charge and utilities connection charges are outside this estimate.</p>
+    </div>
+    <div class="panel">
+      <div class="grid" id="fee-form"></div>
+    </div>
+    <div class="tw"><table id="fee-table"></table></div>
+    <div id="fee-notes" class="prose"></div>
+  </section>
+
+  <!-- CHECK -->
+  <section class="view" id="v-check" hidden>
+    <div class="view-head">
+      <h2>Drawing compliance check</h2>
+      <p class="lead">Upload the architect's drawings. Each sheet is read against the rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen.</p>
+    </div>
+    <div class="note" id="ai-off" hidden>AI review is not available in this view. Open the hub from its claude.ai link while signed in, and allow it to use Claude when asked. Search, process, fees and the pathway pre-check below work without it.</div>
+
+    <div class="panel">
+      <h3>1. Project facts</h3>
+      <div class="grid" id="facts-form"></div>
+      <label class="field"><span>Anything the reviewer should know (site constraints, client brief, known waivers)</span><textarea id="f-notes"></textarea></label>
+      <div id="pathway"></div>
+    </div>
+
+    <div class="panel">
+      <h3>2. Drawings</h3>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose drawing files">
+        <b>Drop PDF, PNG or JPG drawings here, or click to choose</b>
+        <div class="small">Files are read in your browser. Only the sheets you select are sent to Claude for review.</div>
+      </div>
+      <input type="file" id="file" accept="application/pdf,image/png,image/jpeg" multiple hidden>
+      <div class="row" id="thumb-bar" hidden>
+        <span class="small" id="sel-count"></span>
+        <button class="btn ghost sm" id="sel-all" type="button">Select all</button>
+        <button class="btn ghost sm" id="sel-none" type="button">Clear selection</button>
+        <button class="btn ghost sm" id="files-clear" type="button">Remove files</button>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+
+    <div class="panel">
+      <h3>3. Review</h3>
+      <div class="grid">
+        <label class="field"><span>Rule sets to check</span><select id="rv-scope"></select></label>
+        <label class="field"><span>Depth</span><select id="rv-depth"><option value="default">Standard</option><option value="complex">Deep (slower, more usage)</option></select></label>
+      </div>
+      <div class="row">
+        <button class="btn" id="rv-run" type="button" disabled>Review selected sheets</button>
+        <button class="btn ghost" id="rv-stop" type="button" hidden>Stop</button>
+        <span class="small" id="rv-hint">Select at least one sheet.</span>
+      </div>
+      <div class="log" id="rv-log" hidden></div>
+    </div>
+
+    <div id="report"></div>
+
+    <div class="panel">
+      <h3>Saved reviews</h3>
+      <div id="saved" class="small">No saved reviews yet. A review is saved here when it finishes, so the team can reopen it.</div>
+    </div>
+    <div class="panel">
+      <h3>What the team has taught the checker</h3>
+      <p class="small">Each time someone marks a finding right or wrong, the correction is stored and given to the checker on later reviews.</p>
+      <div id="lessons" class="small">No corrections recorded yet.</div>
+    </div>
+  </section>
+
+  <!-- PLAYBOOK -->
+  <section class="view" id="v-playbook" hidden>
+    <div class="view-head">
+      <h2>Managing the architect</h2>
+      <p class="lead">What to ask for, what to check on receipt, and what to chase at each stage, written for the team coordinating the architect's submission work.</p>
+    </div>
+    <div id="playbook"></div>
+  </section>
+</main>
+
+<footer><div class="wrap" id="foot"></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<!--ARTIFACT-BODY-END-->
+</body>
+</html>
