@@ -385,6 +385,21 @@
       'Reply with only JSON: {"sheet":{"title":string,"type":"site plan|floor plan|section|elevation|roof plan|detail|schedule|other","scale":string,"legibility":"good|partial|poor"},' +
       '"findings":[{"rule_id":string,"status":"comply|non_comply|unclear","value_found":string,"location":string,"reason":string}],"other_observations":[string],"missing_on_sheet":[string]}';
   }
+  /* Each sheet's result is kept in this browser for a day, so a failed, stopped or refreshed run does not pay to read the same sheet twice. */
+  var KEEP = "bp.sheet.", KEEP_MS = 24 * 3600 * 1000;
+  function keepKey(s, p, scope, tier) {
+    var str = [window.BPMODE || "bp", scope, tier, s.name, (s.text || "").length, JSON.stringify(p)].join("|"), h = 5381;
+    for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return KEEP + (h >>> 0).toString(36) + "." + str.length;
+  }
+  function keepGet(k) { try { var v = JSON.parse(localStorage.getItem(k) || "null"); return v && Date.now() - v.at < KEEP_MS ? v.r : null; } catch (e) { return null; } }
+  function keepSet(k, r) {
+    try {
+      var old = []; for (var i = 0; i < localStorage.length; i++) { var n = localStorage.key(i); if (n && n.indexOf(KEEP) === 0) { var at = 0; try { at = JSON.parse(localStorage.getItem(n)).at || 0; } catch (e) {} old.push([n, at]); } }
+      old.sort(function (x, y) { return x[1] - y[1]; }); old.forEach(function (o, j) { if (Date.now() - o[1] > KEEP_MS || j < old.length - 60) localStorage.removeItem(o[0]); });
+      localStorage.setItem(k, JSON.stringify({ at: Date.now(), r: r }));
+    } catch (e) {}
+  }
   function mergeFindings(per) {
     var by = {}, order = [];
     per.forEach(function (s) { (s.findings || []).forEach(function (f) {
@@ -419,7 +434,7 @@
   }
   function runReview() {
     var sel = sheets.filter(function (s) { return s.selected; }); if (!sel.length || !aiOn()) return;
-    var p = facts(), scope = $("#rv-scope").value, tier = $("#rv-depth").value, rules = rulesFor(scope);
+    var p = facts(), scope = $("#rv-scope").value, tier = $("#rv-depth").value, rules = rulesFor(scope), fresh = !!($("#rv-fresh") && $("#rv-fresh").checked);
     runCtl = new AbortController(); var signal = runCtl.signal;
     $("#rv-log").textContent = ""; $("#rv-run").disabled = true; $("#rv-stop").hidden = false; $("#report").innerHTML = "";
     log("Checking " + sel.length + " sheet(s) against " + rules.length + " rules. Allow Claude access if asked.");
@@ -427,12 +442,14 @@
     sel.forEach(function (s, i) {
       chain = chain.then(function () {
         if (signal.aborted) return;
+        var kk = keepKey(s, p, scope, tier), had = fresh ? null : keepGet(kk);
+        if (had) { per.push(had); log("Sheet " + (i + 1) + "/" + sel.length + ": " + s.name + " - already read, using the saved result (" + had.findings.length + " findings)"); return; }
         log("Sheet " + (i + 1) + "/" + sel.length + ": " + s.name + " - rendering");
         return s.getCanvas().then(function (c) { return tileImages(c, maxImages); }).then(function (t) {
           log("  sending " + t.blobs.length + " image(s)" + (s.text ? " and " + Math.min(7000, s.text.length) + " characters of text" : "") + ", reading...");
           return aiJson(mt(sheetPrompt(s, p, rules, t.grid)), { images: t.blobs, tier: tier, signal: signal });
         }).then(function (r) {
-          r = r || {}; r.name = s.name; r.findings = Array.isArray(r.findings) ? r.findings : []; per.push(r);
+          r = r || {}; r.name = s.name; r.findings = Array.isArray(r.findings) ? r.findings : []; per.push(r); keepSet(kk, r);
           log("  " + r.findings.length + " finding(s); legibility " + ((r.sheet && r.sheet.legibility) || "not stated"));
         }).catch(function (e) {
           if (e && e.code === "cancelled") throw e;
