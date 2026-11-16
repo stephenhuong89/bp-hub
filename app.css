@@ -484,3 +484,6 @@ footer { background: var(--ink); color: #B9C1C7; border: 0; }
 /* nav: never clip the first links; wrap to a second row when the bar is full */
 nav { justify-content: flex-start; } nav a { padding: 9px 10px; }
 @media (min-width: 701px) { nav { flex-wrap: wrap; overflow: visible; justify-content: flex-end; row-gap: 4px; } }
+/* nav: one row. Right-aligned when it fits; scrolls from the first link when it does not */
+@media (min-width: 701px) { nav { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: thin; } nav a:first-child { margin-left: auto; } nav a { padding: 9px 9px; font-size: .9rem; } .top .wrap { flex-wrap: nowrap; gap: 6px 14px; } }
+@media (min-width: 701px) and (max-width: 1320px) { nav a { padding: 9px 6px; font-size: .86rem; } nav { gap: 0; } a.brand span { font-size: 1.25rem; } }
