@@ -486,7 +486,7 @@
     var order = { non_comply: 0, unclear: 1, comply: 2 };
     var sorted = f.slice().sort(function (a, b) { return (order[a.status] || 0) - (order[b.status] || 0); });
     var o = rep.outlook || {}, html = '<div class="view">' +
-      '<div class="view-head"><h2>Review result</h2><p class="small">' + esc((rv.facts.name || "Untitled project") + " · " + rv.sheets.length + " sheet(s) · " + new Date(rv.at).toLocaleString("en-SG")) + "</p></div>" +
+      '<div class="view-head"><h2>Review result</h2><div class="row pr-off"><button type="button" class="btn" id="rep-pdf">Save as PDF</button><span class="small">Saved in this browser too: reopen it under Saved reviews below.</span></div><p class="small">' + esc((rv.facts.name || "Untitled project") + " · " + rv.sheets.length + " sheet(s) · " + new Date(rv.at).toLocaleString("en-SG")) + "</p></div>" +
       '<div class="note">This is a first-pass screen by an AI reading the sheets you selected. It can misread a dimension or miss one. A finding is not an authority decision and does not replace the QP\'s own check.</div>' +
       '<div class="kpis"><div class="kpi"><b style="color:var(--bad)">' + n.non_comply + '</b><span class="small">Not comply</span></div><div class="kpi"><b style="color:var(--warn)">' + n.unclear + '</b><span class="small">Cannot tell</span></div><div class="kpi"><b style="color:var(--ok)">' + n.comply + '</b><span class="small">Comply</span></div></div>' +
       '<div class="panel"><p>' + esc(rep.summary || "") + '</p><div class="grid">' +
@@ -505,6 +505,7 @@
     var obs = []; (rv.perSheet || []).forEach(function (s) { (s.other_observations || []).forEach(function (t) { obs.push(s.name + ": " + t); }); (s.missing_on_sheet || []).forEach(function (t) { obs.push(s.name + ": missing " + t); }); if (s.error) obs.push(s.name + ": not reviewed. " + s.error); });
     if (obs.length) html += '<h3>Other observations per sheet</h3><div class="panel">' + list(obs) + "</div>";
     $("#report").innerHTML = html + "</div>";
+    var pb = $("#rep-pdf"); if (pb) pb.onclick = printReport;
     var cq = $("#copy-q"); if (cq) cq.onclick = function () {
       var txt = rep.questions_for_architect.map(function (q, i) { return (i + 1) + ". " + q; }).join("\n");
       navigator.clipboard.writeText(txt).then(function () { cq.textContent = "Copied"; }).catch(function () { cq.textContent = "Select the list and copy it manually"; });
@@ -523,8 +524,12 @@
     $("#lessons").innerHTML = lessons.length ? "<ul>" + lessons.slice(0, 40).map(function (l) { var r = RULE[l.rule]; return "<li><b>" + esc(r ? r.title : l.rule) + "</b>: checker said " + esc((ST[l.said] || [0, l.said])[1]) + ", marked " + (l.right ? "right" : "wrong") + (l.note ? ". " + esc(l.note) : "") + "</li>"; }).join("") + "</ul>" : "No corrections recorded yet.";
   }
   var saved = [];
+  var LOCALREV = "bp.reviews." + (window.BPMODE || "bp");
+  function localReviews() { try { var l = JSON.parse(localStorage.getItem(LOCALREV) || "[]"); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
   function saveReview(rv) {
-    if (!db) return;
+    var l = localReviews().filter(function (x) { return x.id !== rv.id; }); l.unshift(JSON.parse(JSON.stringify(rv)));
+    for (var keep = 15; keep > 0; keep = Math.floor(keep / 2)) { try { localStorage.setItem(LOCALREV, JSON.stringify(l.slice(0, keep))); break; } catch (e) {} }
+    if (!db) { saved = localReviews(); renderSaved(); return; }
     var doc = JSON.parse(JSON.stringify(rv));
     db.collection("reviews").doc(rv.id).set(doc).catch(function () { log("The review could not be saved to the shared list (view-only access or store unavailable)."); });
   }
@@ -532,6 +537,15 @@
     $("#saved").innerHTML = saved.length ? '<div class="tw"><table><thead><tr><th>Project</th><th>When</th><th>Sheets</th><th>Not comply</th><th></th></tr></thead><tbody>' + saved.map(function (r, i) {
       var nc = ((r.report && r.report.findings) || []).filter(function (x) { return x.status === "non_comply"; }).length;
       return "<tr><td>" + esc((r.facts && r.facts.name) || "Untitled project") + "</td><td>" + esc(new Date(r.at).toLocaleString("en-SG")) + '</td><td class="num">' + ((r.sheets || []).length) + '</td><td class="num">' + nc + '</td><td><button type="button" class="btn ghost sm" data-open="' + i + '">Open</button></td></tr>'; }).join("") + "</tbody></table></div>" : "No saved reviews yet. A review is saved here when it finishes, so the team can reopen it.";
+  }
+  saved = localReviews(); if (saved.length) renderSaved();
+  function printReport() {
+    var hid = [], el = $("#report"), old = document.title;
+    for (var n = el; n && n !== document.body; n = n.parentNode) Array.prototype.forEach.call(n.parentNode.children, function (c) { if (c !== n && c.tagName !== "SCRIPT" && c.tagName !== "STYLE") { c.classList.add("pr-hide"); hid.push(c); } });
+    document.documentElement.classList.add("print-report");
+    if (current) document.title = ((current.facts && current.facts.name) || "Drawing review") + " - " + (window.BPMODE === "st" ? "ST" : "BP") + " review " + new Date(current.at).toISOString().slice(0, 10);
+    var done = function () { hid.forEach(function (c) { c.classList.remove("pr-hide"); }); document.documentElement.classList.remove("print-report"); document.title = old; window.removeEventListener("afterprint", done); };
+    window.addEventListener("afterprint", done); window.print(); setTimeout(done, 60000);
   }
   $("#saved").addEventListener("click", function (ev) { var b = ev.target.closest("[data-open]"); if (!b) return; current = saved[+b.dataset.open]; renderReport(current); $("#report").scrollIntoView({ behavior: "smooth" }); });
 
