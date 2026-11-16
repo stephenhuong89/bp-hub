@@ -29,6 +29,7 @@
     grid: ["", grid(G, false), "Columns on the architect's plan match the structural plan exactly.", grid(B, true), "The architect added or moved a column without telling the structural QP. BCA names this as a cause of written directions."],
     dims: ["", dims(G, true), "Room named, dimensioned and its area stated, so the rule can be checked from the sheet.", dims(B, false), "No dimension, name or area. Nobody can tell whether it complies, and the authority will ask."]
   };
+  window.BPEXALL = EX;
   window.BPEXOK = {}; Object.keys(EX).forEach(function (k) { window.BPEXOK[k] = EX[k][1]; });
   window.BPEX = function (key) {
     var e = EX[key] || EX.dims, r = null;

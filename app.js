@@ -473,7 +473,7 @@
   }
 
   /* ---------- routing + boot ---------- */
-  var VIEWS = ["story", "guide", "search", "who", "process", "fees", "check", "playbook"];
+  var VIEWS = ["story", "guide", "mistakes", "quiz", "search", "who", "process", "fees", "check", "playbook"];
   window.BPAPP = { refresh: function () { renderProcess(); renderFees(); }, search: search, entryHtml: entryHtml, setQuery: function (q) { $("#q").value = q; $("#ask-panel").hidden = true; renderSearch(); } };
   function route() {
     var v = (location.hash || "").replace("#", ""); if (VIEWS.indexOf(v) < 0) v = "story";

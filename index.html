@@ -18,6 +18,8 @@
     <nav id="nav" aria-label="Sections">
       <a href="#story">Why BP</a>
       <a href="#guide">Learn</a>
+      <a href="#mistakes">Mistakes</a>
+      <a href="#quiz">Quiz</a>
       <a href="#search">Search</a>
       <a href="#who">Who can submit</a>
       <a href="#process">Process</a>
@@ -88,6 +90,32 @@
       <a class="navcard" href="#fees"><b>Authority fees</b><span>Worked out from the schedules</span></a>
       <a class="navcard" href="#check"><b>Check drawings</b><span>Upload a set for an AI screen</span></a>
     </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section class="view" id="v-mistakes" hidden>
+    <div class="view-head">
+      <h2>Why submissions bounce</h2>
+      <p class="lead">The mistakes each authority says it sees most, in its own published lists. Pick an authority.</p>
+    </div>
+    <div class="strip" id="mk-tabs" role="tablist" aria-label="Authority"></div>
+    <div class="mklist" id="mk-list"></div>
+    <p class="srcline" id="mk-src"></p>
+    <div class="view-head">
+      <h2>Subpar against good</h2>
+      <p class="lead">The same floor plan drawn twice. One gives the checker nothing to check. The other shows what the Regulations require on every plan.</p>
+    </div>
+    <div class="viz"><div id="cmp"></div><div class="chks" id="cmp-req"></div></div>
+    <p class="srcline">Neither sheet is a real project. No authority publishes how often submissions draw written directions or how many rounds they take; only URA's figure that about 60% of CAD and BIM files are misnamed could be found.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="v-quiz" hidden>
+    <div class="view-head">
+      <h2>Test yourself</h2>
+      <p class="lead">Ten questions at a time. Every answer shows the clause or case it comes from.</p>
+    </div>
+    <div id="quiz"></div>
   </section>
 
   <!-- SEARCH -->
@@ -250,6 +278,8 @@
 <script src="visuals.js"></script>
 <script src="casestudy.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/motion@10.18.0/dist/motion.min.js"></script>
+<script src="mistakes.js"></script>
+<script src="quiz.js"></script>
 <script src="motion.js"></script>
 <script src="whatif.js"></script>
 <script src="stats.js"></script>
