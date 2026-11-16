@@ -94,7 +94,9 @@
   var sample = null, db = null, lessons = [], aiReady = false;
   var KEYNAME = "bp.apikey", MODEL = "claude-opus-5-5";
   function apiKey() { try { return localStorage.getItem(KEYNAME) || ""; } catch (e) { return ""; } }
-  function aiOn() { return !!sample || !!apiKey(); }
+  var RELAY = "https://cvc-hub.stephenhuong.workers.dev", PASSNAME = "bp.pass";
+  function pass() { try { return localStorage.getItem(PASSNAME) || ""; } catch (e) { return ""; } }
+  function aiOn() { return !!sample || !!apiKey() || !!pass(); }
   function b64(blob) { return new Promise(function (res, rej) { var r = new FileReader(); r.onload = function () { res(String(r.result).split(",")[1]); }; r.onerror = rej; r.readAsDataURL(blob); }); }
   function looseJson(t) {
     try { return JSON.parse(t); } catch (e) {}
@@ -107,8 +109,10 @@
     return Promise.all((images || []).map(b64)).then(function (datas) {
       var content = datas.map(function (d) { return { type: "image", source: { type: "base64", media_type: "image/jpeg", data: d } }; });
       content.push({ type: "text", text: prompt });
-      return fetch("https://api.anthropic.com/v1/messages", { method: "POST", signal: signal,
-        headers: { "content-type": "application/json", "x-api-key": apiKey(), "anthropic-version": "2023-06-01", "anthropic-beta": "server-side-fallback-2026-07-01", "anthropic-dangerous-direct-browser-access": "true" },
+      var viaRelay = !!pass();
+      return fetch(viaRelay ? RELAY + "/v1/messages" : "https://api.anthropic.com/v1/messages", { method: "POST", signal: signal,
+        headers: viaRelay ? { "content-type": "application/json", "x-hub-pass": pass(), "anthropic-version": "2023-06-01", "anthropic-beta": "server-side-fallback-2026-07-01" }
+          : { "content-type": "application/json", "x-api-key": apiKey(), "anthropic-version": "2023-06-01", "anthropic-beta": "server-side-fallback-2026-07-01", "anthropic-dangerous-direct-browser-access": "true" },
         body: JSON.stringify({ model: MODEL, max_tokens: 16000, fallbacks: "default", output_config: { effort: tier === "complex" ? "high" : "medium" }, messages: [{ role: "user", content: content }] }) });
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
@@ -124,23 +128,32 @@
   function aiJson(prompt, o) { return sample ? sample.json(prompt, { images: o.images, modelTier: o.tier, signal: o.signal, cache: false }) : apiCall(prompt, o.images, o.tier, o.signal).then(looseJson); }
   function aiText(prompt, o) { return sample ? sample(prompt, { signal: o.signal, onText: o.onText }) : apiCall(prompt, null, "default", o.signal).then(function (t) { if (o.onText) o.onText({ text: t }); return { text: t }; }); }
   function renderKeyBox() {
-    var box = $("#ai-off"), has = !!apiKey();
+    var box = $("#ai-off"), viaPass = !!pass(), has = viaPass || !!apiKey();
     if (sample) { box.hidden = true; return; }
     box.hidden = false; box.className = "keybox";
-    box.innerHTML = has
+    box.innerHTML = viaPass ? '<b>Claude is connected with the CVC staff passcode.</b><span>Drawings you check go through the CVC relay to Anthropic. You do not need a key.</span><button type="button" class="btn ghost sm" id="key-clear">Disconnect</button>' : has
       ? '<b>Claude is connected with an API key saved in this browser.</b><span>Drawings you check go from this browser straight to Anthropic under that key.</span><button type="button" class="btn ghost sm" id="key-clear">Remove the key</button>'
-      : '<b>Connect Claude to check drawings on this site</b><span>Paste an Anthropic API key. It is saved only in this browser and sent only to api.anthropic.com. Each check is billed to that key. On the claude.ai version of this hub no key is needed.</span><div class="row"><input type="password" id="key-in" placeholder="sk-ant-..." autocomplete="off" aria-label="Anthropic API key"><button type="button" class="btn sm" id="key-save">Connect</button></div>';
+      : '<b>Connect Claude to check drawings on this site</b><span>CVC staff: type the staff passcode. It is saved only in this browser.</span><div class="row"><input type="password" id="pass-in" placeholder="Staff passcode" autocomplete="off" aria-label="Staff passcode"><button type="button" class="btn sm" id="pass-save">Connect</button><span class="small" id="pass-msg" role="status"></span></div>' +
+        '<details><summary class="small">Use your own Anthropic API key instead</summary><span>The key is saved only in this browser and sent only to api.anthropic.com. Each check is billed to that key.</span><div class="row"><input type="password" id="key-in" placeholder="sk-ant-..." autocomplete="off" aria-label="Anthropic API key"><button type="button" class="btn ghost sm" id="key-save">Connect with key</button></div></details>';
     aiReady = has; maxImages = 7; $("#ask-btn").hidden = !has; renderThumbs();
   }
   document.addEventListener("click", function (e) {
     if (e.target.id === "key-save") { var v = ($("#key-in").value || "").trim(); if (v) { try { localStorage.setItem(KEYNAME, v); } catch (x) {} renderKeyBox(); } }
-    if (e.target.id === "key-clear") { try { localStorage.removeItem(KEYNAME); } catch (x) {} renderKeyBox(); }
+    if (e.target.id === "key-clear") { try { localStorage.removeItem(KEYNAME); localStorage.removeItem(PASSNAME); } catch (x) {} renderKeyBox(); }
+    if (e.target.id === "pass-save") {
+      var pv = ($("#pass-in").value || "").trim(), pm = $("#pass-msg"); if (!pv) return;
+      pm.textContent = "Checking..."; e.target.disabled = true;
+      fetch(RELAY + "/ping", { headers: { "x-hub-pass": pv } }).then(function (r) {
+        if (r.ok) { try { localStorage.setItem(PASSNAME, pv); } catch (x) {} renderKeyBox(); return; }
+        pm.textContent = r.status === 401 ? "Wrong passcode." : "The relay answered with an error (" + r.status + ")."; e.target.disabled = false;
+      }).catch(function () { pm.textContent = "Could not reach the relay. Check your connection."; e.target.disabled = false; });
+    }
   });
   function errCopy(e) {
     var c = e && e.code;
     return ({ not_granted: "Claude access was not allowed for this page, so AI features are off for this visit.", rate_limited: "Usage limit reached. Wait a while and try again.", session_expired: "Sign in to claude.ai again, then retry.",
       refused: "Claude declined this request. Change the input and try again.", invalid_json: "The reply could not be read as a structured result. Try again.", image_rejected: "A drawing image was rejected (too large or unreadable). Try a different file.",
-      images_unavailable: "This view cannot send images to Claude.", sampling_disabled: "Claude is not available for this account.", prompt_too_large: "Too much text for one request. Select fewer sheets.", cancelled: "Stopped.", truncated: "The reply was too long and was cut off.", bad_key: "The API key was rejected. Check it and connect again.", empty_completion: "Claude returned nothing for this sheet. Try again." })[c] || "The request failed (" + (c || "unknown") + "). Try again.";
+      images_unavailable: "This view cannot send images to Claude.", sampling_disabled: "Claude is not available for this account.", prompt_too_large: "Too much text for one request. Select fewer sheets.", cancelled: "Stopped.", truncated: "The reply was too long and was cut off.", bad_key: "The passcode or API key was rejected. Check it and connect again.", empty_completion: "Claude returned nothing for this sheet. Try again." })[c] || "The request failed (" + (c || "unknown") + "). Try again.";
   }
   var askCtl = null;
   function askAI() {

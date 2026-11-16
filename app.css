@@ -512,3 +512,5 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 .repcta .btn { font-size: 1.1rem; padding: 14px 24px; } .repcta .rep-mail { background: #fff; color: var(--ink); border-color: #fff; }
 .repfoot { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 10px; }
 @media print { html.print-report .repbrand { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+
+.keybox details { margin-top: 6px; } .keybox details summary { cursor: pointer; color: var(--ink-2); } .keybox details[open] summary { margin-bottom: 6px; }
