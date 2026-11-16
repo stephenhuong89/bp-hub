@@ -114,6 +114,7 @@
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (!r.ok) throw { code: r.status === 401 || r.status === 403 ? "bad_key" : r.status === 429 ? "rate_limited" : r.status === 413 ? "prompt_too_large" : "upstream_error", message: (j.error && j.error.message) || ("HTTP " + r.status) };
         if (j.stop_reason === "refusal") throw { code: "refused" };
+        if (j.stop_reason === "max_tokens") throw { code: "truncated", message: "The reply was cut off before it finished." };
         var text = (j.content || []).filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("");
         if (!text.trim()) throw { code: "empty_completion" };
         return text;
@@ -139,7 +140,7 @@
     var c = e && e.code;
     return ({ not_granted: "Claude access was not allowed for this page, so AI features are off for this visit.", rate_limited: "Usage limit reached. Wait a while and try again.", session_expired: "Sign in to claude.ai again, then retry.",
       refused: "Claude declined this request. Change the input and try again.", invalid_json: "The reply could not be read as a structured result. Try again.", image_rejected: "A drawing image was rejected (too large or unreadable). Try a different file.",
-      images_unavailable: "This view cannot send images to Claude.", sampling_disabled: "Claude is not available for this account.", prompt_too_large: "Too much text for one request. Select fewer sheets.", cancelled: "Stopped.", bad_key: "The API key was rejected. Check it and connect again.", empty_completion: "Claude returned nothing for this sheet. Try again." })[c] || "The request failed (" + (c || "unknown") + "). Try again.";
+      images_unavailable: "This view cannot send images to Claude.", sampling_disabled: "Claude is not available for this account.", prompt_too_large: "Too much text for one request. Select fewer sheets.", cancelled: "Stopped.", truncated: "The reply was too long and was cut off.", bad_key: "The API key was rejected. Check it and connect again.", empty_completion: "Claude returned nothing for this sheet. Try again." })[c] || "The request failed (" + (c || "unknown") + "). Try again.";
   }
   var askCtl = null;
   function askAI() {
@@ -384,16 +385,37 @@
       'Reply with only JSON: {"sheet":{"title":string,"type":"site plan|floor plan|section|elevation|roof plan|detail|schedule|other","scale":string,"legibility":"good|partial|poor"},' +
       '"findings":[{"rule_id":string,"status":"comply|non_comply|unclear","value_found":string,"location":string,"reason":string}],"other_observations":[string],"missing_on_sheet":[string]}';
   }
-  function synthPrompt(p, per, rules) {
-    return "You are combining a sheet-by-sheet screening of a Singapore building plan drawing set into one report for a civil and structural engineering firm's team, who manage the architect. Be technical and direct.\n\n" +
+  function mergeFindings(per) {
+    var by = {}, order = [];
+    per.forEach(function (s) { (s.findings || []).forEach(function (f) {
+      if (!f || !f.rule_id) return; var st = f.status === "comply" || f.status === "non_comply" ? f.status : "unclear";
+      if (!by[f.rule_id]) { by[f.rule_id] = []; order.push(f.rule_id); }
+      by[f.rule_id].push({ status: st, value_found: f.value_found || "", location: f.location || "", reason: f.reason || "", sheet: s.name });
+    }); });
+    return order.map(function (id) {
+      var all = by[id], st = all.some(function (x) { return x.status === "non_comply"; }) ? "non_comply" : all.some(function (x) { return x.status === "comply"; }) ? "comply" : "unclear";
+      var pick = all.filter(function (x) { return x.status === st; }), main = pick[0], names = [];
+      pick.forEach(function (x) { if (names.indexOf(x.sheet) < 0) names.push(x.sheet); });
+      var reason = st === "non_comply" && names.length > 1 ? pick.slice(0, 4).map(function (x) { return x.sheet + ": " + x.reason; }).join(" \u2022 ") + (pick.length > 4 ? " \u2022 and " + (pick.length - 4) + " more" : "") : main.reason;
+      var others = all.length - pick.length;
+      if (st === "comply" && others) reason += " (" + others + " other sheet reading" + (others > 1 ? "s were" : " was") + " unclear.)";
+      return { rule_id: id, status: st, value_found: main.value_found, location: main.location, sheets: names, reason: reason };
+    });
+  }
+  function synthPrompt(p, per, rules, merged) {
+    var cut = function (s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n) + "..." : s; };
+    var open = merged.filter(function (f) { return f.status !== "comply"; }), lim = open.length > 120 ? 160 : open.length > 60 ? 260 : 420;
+    var sheetsMeta = per.map(function (s) { return { name: s.name, sheet: s.sheet, error: s.error, missing_on_sheet: (s.missing_on_sheet || []).slice(0, 10), other_observations: (s.other_observations || []).slice(0, 8).map(function (t) { return cut(t, 240); }) }; });
+    return "You are writing the overall verdict for a sheet-by-sheet screening of a Singapore building plan drawing set, for a civil and structural engineering firm's team, who manage the architect. Be technical and direct.\n\n" +
       "PROJECT FACTS: " + JSON.stringify(p) + "\n\nRULES CHECKED (id | agency | requirement):\n" + rules.map(function (e) { return e.id + " | " + e.agency + " | " + e.title; }).join("\n") +
-      "\n\nPER-SHEET RESULTS:\n" + JSON.stringify(per).slice(0, 150000) + lessonText() +
-      "\n\nTASK:\n1. Merge duplicate findings for the same rule (keep the clearest evidence, list the sheets). A non_comply on any sheet outweighs comply on another unless they are different locations.\n" +
-      "2. missing_information: what the set as a whole does not show that a BP submission needs (sheets or data absent).\n3. hurdles: the specific things most likely to draw a written direction or delay clearance, most serious first, each with the agency.\n" +
+      "\n\nSHEETS REVIEWED:\n" + JSON.stringify(sheetsMeta).slice(0, 40000) +
+      "\n\nFINDINGS ALREADY MERGED BY RULE, not comply and unclear only:\n" + JSON.stringify(open.map(function (f) { return { rule_id: f.rule_id, status: f.status, value_found: cut(f.value_found, 120), reason: cut(f.reason, lim), sheets: f.sheets.length }; })).slice(0, 90000) +
+      "\n\nRULES FOUND TO COMPLY: " + merged.filter(function (f) { return f.status === "comply"; }).map(function (f) { return f.rule_id; }).join(", ") + lessonText() +
+      "\n\nTASK (the findings list is already shown to the team, do not repeat it):\n1. summary: three or four sentences on the state of the set.\n" +
+      "2. missing_information: what the set as a whole does not show that a BP submission needs (sheets or data absent). At most 12 items.\n3. hurdles: the specific things most likely to draw a written direction or delay clearance, most serious first, each with the agency. At most 12.\n" +
       "4. outlook: for BP/plan approval and for TOP/CSC, a band (\"likely to clear\", \"likely to draw queries\", \"likely to be rejected or need redesign\", \"cannot assess\") and one or two sentences of reasons grounded in the findings. This is a screening judgment from the sheets reviewed, not a prediction of the authority's decision.\n" +
-      "5. questions_for_architect: precise questions or requests the team should send the architect.\nUse only what the per-sheet results contain. Do not invent values.\n\n" +
-      'Reply with only JSON: {"summary":string,"findings":[{"rule_id":string,"status":"comply|non_comply|unclear","value_found":string,"location":string,"sheets":[string],"reason":string}],' +
-      '"missing_information":[string],"hurdles":[{"agency":string,"issue":string,"severity":"high|medium|low"}],"outlook":{"bp":{"band":string,"reason":string},"top_csc":{"band":string,"reason":string}},"questions_for_architect":[string]}';
+      "5. questions_for_architect: precise questions or requests the team should send the architect. At most 15.\nUse only what the results above contain. Do not invent values.\n\n" +
+      'Reply with only JSON: {"summary":string,"missing_information":[string],"hurdles":[{"agency":string,"issue":string,"severity":"high|medium|low"}],"outlook":{"bp":{"band":string,"reason":string},"top_csc":{"band":string,"reason":string}},"questions_for_architect":[string]}';
   }
   function runReview() {
     var sel = sheets.filter(function (s) { return s.selected; }); if (!sel.length || !aiOn()) return;
@@ -422,10 +444,14 @@
     chain.then(function () {
       if (signal.aborted) throw { code: "cancelled" };
       if (!per.some(function (x) { return !x.error; })) throw { code: "none", message: "No sheet could be reviewed." };
-      log("Combining results...");
-      return aiJson(mt(synthPrompt(p, per, rules)), { tier: tier, signal: signal });
+      var merged = mergeFindings(per);
+      log("Combining results: " + merged.length + " rules with findings. Writing the verdict...");
+      return aiJson(mt(synthPrompt(p, per, rules, merged)), { tier: tier, signal: signal }).catch(function (e) {
+        if (e && e.code === "cancelled") throw e;
+        log("The overall verdict could not be written (" + errCopy(e) + "). The findings below are complete.");
+        return { summary: "The overall verdict could not be generated for this run. Every finding from the sheets is listed below; run the review again on fewer sheets to get the verdict, hurdles and questions.", verdict_failed: true };
+      }).then(function (rep) { rep = rep || {}; rep.findings = merged; return rep; });
     }).then(function (rep) {
-      rep = rep || {}; rep.findings = Array.isArray(rep.findings) ? rep.findings : [];
       current = { id: "r" + Date.now(), at: new Date().toISOString(), facts: p, scope: scope, sheets: sel.map(function (s) { return s.name; }), report: rep, perSheet: per.map(function (x) { return { name: x.name, sheet: x.sheet, error: x.error, other_observations: x.other_observations, missing_on_sheet: x.missing_on_sheet }; }) };
       log("Done."); renderReport(current); saveReview(current);
     }).catch(function (e) {
