@@ -16,7 +16,8 @@
   <div class="wrap">
     <div class="brand">CVC <span>BP Submission Hub</span></div>
     <nav id="nav" aria-label="Sections">
-      <a href="#guide">Start here</a>
+      <a href="#story">Why BP</a>
+      <a href="#guide">Learn</a>
       <a href="#search">Search</a>
       <a href="#who">Who can submit</a>
       <a href="#process">Process</a>
@@ -28,11 +29,31 @@
 </header>
 
 <main class="wrap">
+  <!-- STORY -->
+  <section class="view" id="v-story">
+    <div class="hero">
+      <span class="label">Why building plan approval exists</span>
+      <h1>Every building you walk into was checked before it was built.</h1>
+      <p class="lead">Switch the checks off, one authority at a time, and watch the same street.</p>
+    </div>
+    <div class="wi">
+      <div class="canvas" id="wi-scene"></div>
+      <div class="wi-side"><div id="wi-count" class="wi-count"></div><div id="wi-switches" class="switches"></div><button type="button" class="btn" id="wi-all"></button></div>
+    </div>
+    <div id="story"></div>
+    <div class="grid">
+      <a class="navcard" href="#guide"><b>Learn to read a plan</b><span>Interactive drawings and testers</span></a>
+      <a class="navcard" href="#who"><b>Who can submit</b><span>Architect or PE</span></a>
+      <a class="navcard" href="#process"><b>The process</b><span>Step by step</span></a>
+      <a class="navcard" href="#check"><b>Check drawings</b><span>AI screen of a set</span></a>
+    </div>
+  </section>
+
   <!-- GUIDE -->
-  <section class="view" id="v-guide">
+  <section class="view" id="v-guide" hidden>
     <div class="view-head">
-      <h2>What a building plan submission is, and why it exists</h2>
-      <p class="lead">Before anything is built in Singapore, drawings of it go to the authorities, who check that it will stand up, let people escape a fire, be safe and usable, and fit its site. That check is the building plan (BP) submission. Click the numbered points on each drawing.</p>
+      <h2>Learn to read a building plan the way the authority does</h2>
+      <p class="lead">Drawings go to the authorities before anything is built. Click the numbered points.</p>
       <div class="searchbar"><input type="search" id="g-q" placeholder="Or search the rules directly and press Enter" aria-label="Search the hub"></div>
     </div>
 
@@ -212,6 +233,9 @@
 <script src="examples.js"></script>
 <script src="guide.js"></script>
 <script src="viz.js"></script>
+<script src="whatif.js"></script>
+<script src="stats.js"></script>
+<script src="story.js"></script>
 <!--ARTIFACT-BODY-END-->
 </body>
 </html>

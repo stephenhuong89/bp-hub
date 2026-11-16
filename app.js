@@ -429,10 +429,10 @@
   }
 
   /* ---------- routing + boot ---------- */
-  var VIEWS = ["guide", "search", "who", "process", "fees", "check", "playbook"];
+  var VIEWS = ["story", "guide", "search", "who", "process", "fees", "check", "playbook"];
   window.BPAPP = { refresh: function () { renderProcess(); renderFees(); }, search: search, entryHtml: entryHtml, setQuery: function (q) { $("#q").value = q; $("#ask-panel").hidden = true; renderSearch(); } };
   function route() {
-    var v = (location.hash || "").replace("#", ""); if (VIEWS.indexOf(v) < 0) v = "guide";
+    var v = (location.hash || "").replace("#", ""); if (VIEWS.indexOf(v) < 0) v = "story";
     VIEWS.forEach(function (n) { $("#v-" + n).hidden = n !== v; });
     $$("#nav a").forEach(function (a) { if (a.getAttribute("href") === "#" + v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     window.scrollTo(0, 0);
