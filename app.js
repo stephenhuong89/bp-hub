@@ -283,7 +283,22 @@
     var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
     return page.render({ canvasContext: g, viewport: vp, intent: "print" }).promise.then(function () { return c; });
   }
+  function dropMsg(skipped, added) {
+    var el = $("#drop-msg"); if (!el) return;
+    if (!skipped || !skipped.length) { el.hidden = true; el.textContent = ""; return; }
+    var by = {}, cad = false;
+    skipped.forEach(function (n) { var m = /\.([a-z0-9]+)$/i.exec(n), x = m ? m[1].toUpperCase() : "other"; by[x] = (by[x] || 0) + 1; if (/^(DWG|DXF|DGN|RVT|IFC|SKP)$/.test(x)) cad = true; });
+    var parts = Object.keys(by).sort(function (p, q) { return by[q] - by[p]; }).map(function (x) { return by[x] + " " + x; });
+    el.textContent = (added ? "" : "No sheets were loaded. ") + skipped.length + (skipped.length === 1 ? " file" : " files") + " could not be read (" + parts.join(", ") + "). The checker reads PDF, PNG and JPG, and opens zip files to find them." +
+      (cad ? " Plot the CAD files to PDF first, or ask for the PDF set." : "");
+    el.hidden = false;
+    if (!added && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
   function addFiles(files) {
+    var skipped = [], before = sheets.length; dropMsg(null);
+    return readFiles(files, skipped).then(function () { dropMsg(skipped, sheets.length - before); renderThumbs(); });
+  }
+  function readFiles(files, skipped) {
     var chain = Promise.resolve();
     Array.prototype.forEach.call(files, function (file) {
       chain = chain.then(function () {
@@ -312,7 +327,23 @@
             renderThumbs();
           }).catch(function () { log("Could not read image " + file.name); });
         }
-        log("Skipped " + file.name + ": only PDF, PNG and JPG are read.");
+        if (/\.zip$/i.test(file.name) || /zip/i.test(file.type)) {
+          if (!window.JSZip) { skipped.push(file.name); return; }
+          return file.arrayBuffer().then(function (buf) { return window.JSZip.loadAsync(buf); }).then(function (z) {
+            var inner = [], p = Promise.resolve();
+            z.forEach(function (path, ent) {
+              if (ent.dir || /(^|\/)(__MACOSX\/|\._|\.DS_Store|Thumbs\.db)/.test(path)) return;
+              var nm = path.split("/").pop(), m = /\.(pdf|png|jpe?g|zip)$/i.exec(nm);
+              if (!m) { skipped.push(nm); return; }
+              p = p.then(function () { return ent.async("blob"); }).then(function (b) {
+                var x = m[1].toLowerCase(), type = x === "pdf" ? "application/pdf" : x === "png" ? "image/png" : x === "zip" ? "application/zip" : "image/jpeg";
+                inner.push(new File([b], nm, { type: type }));
+              });
+            });
+            return p.then(function () { return readFiles(inner, skipped); });
+          }).catch(function () { skipped.push(file.name); });
+        }
+        skipped.push(file.name);
       });
     });
     return chain;
@@ -323,7 +354,7 @@
     $("#thumb-bar").hidden = !sheets.length;
     $("#sel-count").textContent = n + " of " + sheets.length + " sheets selected";
     $("#rv-run").disabled = !n || !aiReady || !!runCtl;
-    $("#rv-hint").textContent = !aiReady ? "Connect Claude above to run the check." : !n ? "Select at least one sheet." : n > 12 ? "That is a lot of sheets. Each one is a separate request on your Claude usage." : "Each sheet is one request, plus one to combine the results.";
+    $("#rv-hint").textContent = !aiReady ? "Connect Claude above to run the check." : !sheets.length ? "No sheets loaded yet. Add PDF, PNG or JPG files, or a zip of them, in step 1." : !n ? "Select at least one sheet." : n > 12 ? "That is a lot of sheets. Each one is a separate request on your Claude usage." : "Each sheet is one request, plus one to combine the results.";
   }
   function rulesFor(scope) {
     return D.entries.filter(function (e) { return e.kind === "rule" && e.checkable !== false && (scope === "all" || e.scope === scope); });
@@ -468,7 +499,7 @@
     $("#thumbs").addEventListener("click", toggle); $("#thumbs").addEventListener("keydown", toggle);
     $("#sel-all").onclick = function () { sheets.forEach(function (s) { s.selected = true; }); renderThumbs(); };
     $("#sel-none").onclick = function () { sheets.forEach(function (s) { s.selected = false; }); renderThumbs(); };
-    $("#files-clear").onclick = function () { sheets = []; renderThumbs(); };
+    $("#files-clear").onclick = function () { sheets = []; dropMsg(null); renderThumbs(); };
     $("#rv-run").onclick = runReview;
     $("#rv-stop").onclick = function () { if (runCtl) runCtl.abort(); };
     renderThumbs();
