@@ -514,3 +514,5 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 @media print { html.print-report .repbrand { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 
 .keybox details { margin-top: 6px; } .keybox details summary { cursor: pointer; color: var(--ink-2); } .keybox details[open] summary { margin-bottom: 6px; }
+
+#report:not(:empty) + #report-ph { display: none; } #report-ph .btn[disabled] { opacity: .45; cursor: not-allowed; }
