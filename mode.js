@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   var saved = null; try { saved = localStorage.getItem("bp.mode"); } catch (e) {}
-  var SETS = { st: "ST", ura: "URA", scdf: "SCDF", pub: "PUB" };
+  var SETS = { st: "ST", ura: "URA", scdf: "SCDF", pub: "PUB", lta: "LTA" };
   var modes = ["bp"].concat(Object.keys(SETS).filter(function (m) { return !!window[SETS[m] + "DATA"]; }));
   var mode = modes.indexOf(saved) >= 0 ? saved : "bp";
   var NAMES = {
@@ -11,7 +11,8 @@
     st: ["ST", "Structural plan submission", "Structural plans, calculations, the accredited checker, piling, excavation and supervision. CVC's own submissions."],
     ura: ["URA", "Planning permission", "Use, plot ratio, height and setbacks under the Planning Act. The first approval, before any building plan."],
     scdf: ["SCDF", "Fire safety submission", "Fire safety plans, minor A&A lodgment, the Registered Inspector and the Fire Safety Certificate."],
-    pub: ["PUB", "Drainage, sewerage and water", "Surface water drainage, earth control, sewerage and sanitary works, and water services. Civil submissions CVC signs itself."]
+    pub: ["PUB", "Drainage, sewerage and water", "Surface water drainage, earth control, sewerage and sanitary works, and water services. Civil submissions CVC signs itself."],
+    lta: ["LTA", "Streets, parking and railways", "Street works, vehicle parking, and works near MRT lines and road structures."]
   };
   window.BPMODE = mode; window.BPTAG = NAMES[mode][0]; document.documentElement.setAttribute("data-mode", mode);
   if (mode !== "bp") {
@@ -89,7 +90,21 @@
     ["#v-check .view-head .lead", "Upload the civil drawings. Each sheet is read against the PUB rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen."], ["#drop b", "Drop the civil drawings here"],
     ["#v-playbook .view-head h2", "Managing a PUB submission, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
   ];
-  var PLACE = { pub: "Try: platform level, detention tank, silt, sewer setback, inspection chamber, grease trap", scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
+  TXT.lta = [
+    ['#nav a[href="#story"]', "Why LTA"], ['#nav a[href="#who"]', "Which submission"], ['#nav a[href="#playbook"]', "Managing the submission"],
+    ["#v-story .hero .label", "Why LTA clearance exists"], ["#v-story .hero h1", "Every site meets a road. Some sit beside a railway."], ["#v-story .hero .lead", "LTA checks how vehicles and people get in and out, how many cars the site parks, and whether the works can touch a tunnel, a viaduct or a track."],
+    ["#v-story > .grid .navcard:nth-child(1) b", "Learn the numbers"], ["#v-story > .grid .navcard:nth-child(1) span", "Parking and railway zone testers"], ["#v-story > .grid .navcard:nth-child(2) b", "Which submission"], ["#v-story > .grid .navcard:nth-child(2) span", "Street works, parking, railway protection"], ["#v-story > .grid .navcard:nth-child(4) span", "AI screen of a car park or street plan"],
+    ["#v-guide .view-head h2", "Learn to read a site the way LTA does"], ["#v-guide .view-head .lead", "Parking bays, ramps and the zones around a railway, each with a calculator."], ["#v-guide > h3", "Twelve numbers every LTA submission turns on"],
+    ["#v-guide > .grid .navcard:nth-child(1) b", "Which submission"], ["#v-guide > .grid .navcard:nth-child(1) span", "By type of works"], ["#v-guide > .grid .navcard:nth-child(4) span", "Upload car park or street plans for an AI screen"],
+    ["#v-mistakes .view-head h2", "Why LTA submissions stall"], ["#v-mistakes .view-head .lead", "Where street works, parking and railway protection submissions and sites go wrong, from LTA's codes and its enforcement. Pick a stage."],
+    ["#v-search .view-head h2", "Search Singapore street works, parking and railway protection rules"],
+    ["#v-who .view-head h2", "Which submission: street works, parking or railway protection"], ["#v-who .view-head .lead", "Which works need which LTA clearance, and who must sign."],
+    ["#v-process .view-head h2", "From development control clearance to handing over the street works"], ["#v-process .view-head .lead", "The LTA sequence: who acts, what goes in, what comes back, how long LTA takes, and what usually stalls it."],
+    ["#v-fees .view-head .lead", "LTA's charges for submissions, from the published schedules. Monitoring instruments, traffic studies and road reinstatement are commercial costs outside this estimate."],
+    ["#v-check .view-head .lead", "Upload the car park and street plans. Each sheet is read against the LTA rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen."], ["#drop b", "Drop the car park and street plans here"],
+    ["#v-playbook .view-head h2", "Managing an LTA submission, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
+  ];
+  var PLACE = { lta: "Try: parking lot, ramp gradient, railway protection zone, access point, road opening, transport impact", pub: "Try: platform level, detention tank, silt, sewer setback, inspection chamber, grease trap", scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
   if (TXT[mode]) {
     TXT[mode].forEach(function (t) { var el = document.querySelector(t[0]); if (el) el.textContent = t[1]; });
     var qi = document.querySelector("#q"); if (qi) qi.placeholder = PLACE[mode];

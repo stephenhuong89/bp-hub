@@ -532,3 +532,9 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 [data-mode="pub"] .bp-only, [data-mode="pub"] .st-only, [data-mode="pub"] .ura-only, html:not([data-mode="pub"]) .pub-only { display: none !important; }
 .modesw button { padding: 8px 6px; font-size: .88rem; }
 .dwg .water { fill: #BFD9EC; stroke: #2B6C9B; stroke-width: 1.5; } .dwg .pipe { fill: none; stroke: #2B6C9B; stroke-width: 5; } .dwg .zone.bad { fill: #F4C9CB; }
+
+/* LTA mode. The mode switch becomes a dropdown-width strip that may scroll with the menu. */
+[data-mode="lta"] .bp-only, [data-mode="lta"] .st-only, [data-mode="lta"] .ura-only, html:not([data-mode="lta"]) .lta-only { display: none !important; }
+[data-mode="lta"] .scdf-only, [data-mode="lta"] .pub-only, [data-mode="pub"] .scdf-only, [data-mode="scdf"] .pub-only { display: none !important; }
+.modesw button { padding: 8px 5px; font-size: .84rem; }
+.dwg .bay { fill: var(--sheet); stroke: var(--ink); stroke-width: 1.5; } .dwg .car { fill: var(--line-2); stroke: var(--ink-3); stroke-width: 1; } .dwg .rail { fill: var(--ink); } .dwg .zone.warn { fill: #F6E3B4; }

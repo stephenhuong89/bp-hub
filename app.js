@@ -5,10 +5,13 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", WATER = window.BPMODE === "pub", TAG = window.BPTAG || "BP";
-  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : window.BPMODE === "pub" ? ["PUB clearance outlook", "TOP / CSC outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
-  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)", pub: "Drainage, sewerage and water (PUB)" }[window.BPMODE || "bp"];
+  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", WATER = window.BPMODE === "pub", ROAD = window.BPMODE === "lta", TAG = window.BPTAG || "BP";
+  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : window.BPMODE === "pub" ? ["PUB clearance outlook", "TOP / CSC outlook"] : window.BPMODE === "lta" ? ["LTA clearance outlook", "TOP / CSC outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
+  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)", pub: "Drainage, sewerage and water (PUB)", lta: "Streets, parking and railway protection (LTA)" }[window.BPMODE || "bp"];
   function mt(s) {
+    if (ROAD) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "LTA street works, parking and railway protection submissions").replace(/building plan \(BP\)/g, "LTA submission")
+      .replace(/building plan drawing set/g, "street works and parking drawing set").replace(/BP\/plan approval/g, "LTA clearance")
+      .replace(/a BP submission needs/g, "an LTA submission needs").replace(/standard BP sheet contents/g, "standard street works and parking plan contents").replace(/\bBP\b/g, "LTA");
     if (WATER) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "PUB drainage, sewerage and water submissions").replace(/building plan \(BP\)/g, "PUB civil submission")
       .replace(/building plan drawing set/g, "civil drawing set").replace(/BP\/plan approval/g, "PUB clearance")
       .replace(/a BP submission needs/g, "a PUB submission needs").replace(/standard BP sheet contents/g, "standard civil drawing contents").replace(/\bBP\b/g, "PUB");
