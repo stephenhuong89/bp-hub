@@ -38,14 +38,14 @@
   function tower(x, y) { return '<path d="M' + (x + 8) + " " + (y + 44) + " v-40 h24 v40 z M" + (x + 14) + " " + (y + 12) + " h12 M" + (x + 14) + " " + (y + 20) + " h12 M" + (x + 14) + " " + (y + 28) + " h12 M" + (x + 14) + " " + (y + 36) + ' h12" class="ic"/>'; }
   function wall(x, y) { return '<path d="M' + x + " " + (y + 44) + " h44 M" + (x + 16) + " " + (y + 44) + " v-34 h8 v34 M" + (x + 24) + " " + (y + 14) + " l18 6 M" + (x + 24) + " " + (y + 24) + " l18 6 M" + (x + 24) + " " + (y + 34) + ' l18 6" class="ic"/>'; }
   var flow = $("#who-flow");
-  if (flow) flow.innerHTML = '<svg viewBox="0 0 900 300" class="dwg flow" role="img" aria-label="Flowchart: who can submit building plans">' +
+  if (flow) flow.innerHTML = '<svg viewBox="0 0 900 340" class="dwg flow" role="img" aria-label="Flowchart: who can submit building plans">' +
     '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="ahd"/></marker></defs>' +
     q(20, 30, "Is it an engineering structure?", "retaining wall, foundation, bridge,", "cladding, tank, crane gantry") + q(335, 30, "Is it on the shared list?", "landed A&amp;A, A&amp;A inside a building,", "factory, warehouse, substation") +
     '<line x1="250" y1="73" x2="333" y2="73" class="fa" marker-end="url(#ah)"/><text x="292" y="64" class="ft mid">No</text><line x1="565" y1="73" x2="648" y2="73" class="fa" marker-end="url(#ah)"/><text x="607" y="64" class="ft mid">No</text>' +
     '<line x1="135" y1="116" x2="135" y2="196" class="fa" marker-end="url(#ah)"/><text x="150" y="160" class="ft">Yes</text><line x1="450" y1="116" x2="450" y2="196" class="fa" marker-end="url(#ah)"/><text x="465" y="160" class="ft">Yes</text>' +
     res(20, 198, "pe", "PE only", "CVC submits everything") + res(335, 198, "either", "PE or architect", "CVC can be the sole QP") + res(650, 42, "arch", "Architect", "for the building plans") +
-    wall(112, 246) + house(408, 246) + factory(460, 246) + tower(742, 112) +
-    '<text x="765" y="190" class="ft mid">new house, flats, office,</text><text x="765" y="208" class="ft mid">shop, school, hotel</text><text x="765" y="240" class="ft mid b">Structural plans: always a PE</text></svg>';
+    wall(112, 278) + house(404, 278) + factory(456, 278) + tower(742, 116) +
+    '<text x="765" y="194" class="ft mid">new house, flats, office,</text><text x="765" y="212" class="ft mid">shop, school, hotel</text><text x="765" y="300" class="ft mid b">Structural plans: always a PE</text></svg>';
   var hl = $("#who-headline");
   if (hl) { var p = hl.querySelector(".panel"); if (p) { var d = document.createElement("details"); d.className = "more"; d.innerHTML = "<summary>Read the legal basis</summary>"; p.parentNode.insertBefore(d, p); d.appendChild(p); } }
   var wn = $("#who-notes");

@@ -30,11 +30,11 @@
 
   var stage = 0, box = $("#playbook");
   function road() {
-    var n = C.length, x = function (i) { return 62 + i * (776 / (n - 1)); }, y = function (i) { return i % 2 ? 96 : 52; }, d = "M" + x(0) + " " + y(0);
+    var n = C.length, x = function (i) { return 62 + i * (776 / (n - 1)); }, y = function (i) { return i % 2 ? 128 : 84; }, d = "M" + x(0) + " " + y(0);
     for (var i = 1; i < n; i++) { var mx = (x(i - 1) + x(i)) / 2; d += " C " + mx + " " + y(i - 1) + ", " + mx + " " + y(i) + ", " + x(i) + " " + y(i); }
-    var s = '<svg viewBox="0 0 900 190" class="dwg road" style="min-width:640px" role="tablist" aria-label="Stages of managing the architect"><path d="' + d + '" class="rd"/><path d="' + d + '" class="rdl"/>';
+    var s = '<svg viewBox="0 0 900 215" class="dwg road" style="min-width:640px" role="tablist" aria-label="Stages of managing the architect"><path d="' + d + '" class="rd"/><path d="' + d + '" class="rdl"/>';
     C.forEach(function (c, k) {
-      var up = k % 2 === 0, ty = up ? y(k) - 34 : y(k) + 44;
+      var up = k % 2 === 0, ty = up ? y(k) - 48 : y(k) + 46;
       s += '<g class="stn' + (k === stage ? " on" : k < stage ? " done" : "") + '" data-i="' + k + '" role="tab" tabindex="0" aria-selected="' + (k === stage) + '" aria-label="' + esc(c.stage + ": " + c.title) + '"><circle cx="' + x(k) + '" cy="' + y(k) + '" r="21"/><text x="' + x(k) + '" y="' + (y(k) + 6) + '" class="sn">' + (k + 1) + '</text><text x="' + x(k) + '" y="' + ty + '" class="sl b">' + esc(c.stage) + '</text><text x="' + x(k) + '" y="' + (ty + 15) + '" class="sl">' + esc(c.tag) + "</text></g>";
     });
     return s + "</svg>";

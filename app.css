@@ -334,3 +334,17 @@ details.more { border: 1px solid var(--line); border-radius: var(--r); backgroun
 .lesson blockquote { font-size: clamp(1.15rem, 2.4vw, 1.5rem); } .lesson { max-width: 60ch; }
 .also { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 6px; } .alsoc { border: 1px dashed var(--line); border-radius: var(--r); padding: 10px 12px; text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .alsoc:hover { border-color: var(--bad); } .alsoc b { font-family: var(--f-head); font-size: 1.4rem; color: var(--bad); } .alsoc span { font-size: .84rem; color: var(--ink-2); }
+
+/* motion layer: applies only once motion.js has started (html.mo) */
+.progress { position: fixed; inset: 0 0 auto 0; height: 3px; background: #d3141b; transform-origin: 0 50%; transform: scaleX(0); z-index: 20; pointer-events: none; }
+.hero h1 .w { display: inline-block; }
+.stn circle, .bb circle, .flow .fr, .flow .fq, .gantt .gb { transform-box: fill-box; transform-origin: center; }
+.gantt .gb { transform-origin: 0 50%; }
+.mo .tile, .mo .numcard, .mo .navcard, .mo .frame, .mo .alsoc, .mo .sheet, .mo .bucket, .mo .ex { transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s, box-shadow .18s; }
+.mo .tile:hover, .mo .numcard:hover, .mo .navcard:hover, .mo .frame:hover, .mo .alsoc:hover, .mo .sheet:hover { transform: translateY(-4px); box-shadow: 0 10px 24px -14px var(--ink); }
+.mo .btn, .mo .chip, .mo .sw { transition: transform .12s; } .mo .btn:active, .mo .chip:active, .mo .sw:active, .mo .stp:active { transform: scale(.96); }
+.mo .stn.on circle { animation: stnpulse 1.6s ease-in-out infinite; } @keyframes stnpulse { 0%, 100% { stroke-width: 3; stroke-opacity: 1; } 50% { stroke-width: 12; stroke-opacity: .25; } }
+.mo .sc.no-st #wi-main { animation: shake .5s linear 1; } @keyframes shake { 0%, 100% { translate: 0 0; } 20% { translate: -5px 1px; } 40% { translate: 5px -1px; } 60% { translate: -4px 0; } 80% { translate: 3px 1px; } }
+.mo .sc.no-pb .flood { animation: wave 2.4s ease-in-out infinite alternate; } @keyframes wave { to { transform: translateY(-5px); } }
+.mo .sc.no-fr .smoke { animation: drift 2.6s ease-in-out infinite alternate; } @keyframes drift { to { transform: translate(8px, -8px); opacity: .3; } }
+.mo .hs.on circle { animation: hspulse 1.4s ease-in-out infinite; } @keyframes hspulse { 50% { stroke-width: 7; } }
