@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   var saved = null; try { saved = localStorage.getItem("bp.mode"); } catch (e) {}
-  var SETS = { st: "ST", ura: "URA", scdf: "SCDF", pub: "PUB", lta: "LTA" };
+  var SETS = { st: "ST", ura: "URA", scdf: "SCDF", pub: "PUB", lta: "LTA", plans: "PLANS" };
   var modes = ["bp"].concat(Object.keys(SETS).filter(function (m) { return !!window[SETS[m] + "DATA"]; }));
   var mode = modes.indexOf(saved) >= 0 ? saved : "bp";
   var NAMES = {
@@ -12,7 +12,8 @@
     ura: ["URA", "Planning permission", "Use, plot ratio, height and setbacks under the Planning Act. The first approval, before any building plan."],
     scdf: ["SCDF", "Fire safety submission", "Fire safety plans, minor A&A lodgment, the Registered Inspector and the Fire Safety Certificate."],
     pub: ["PUB", "Drainage, sewerage and water", "Surface water drainage, earth control, sewerage and sanitary works, and water services. Civil submissions CVC signs itself."],
-    lta: ["LTA", "Streets, parking and railways", "Street works, vehicle parking, and works near MRT lines and road structures."]
+    lta: ["LTA", "Streets, parking and railways", "Street works, vehicle parking, and works near MRT lines and road structures."],
+    plans: ["PLANS", "Getting the as-built drawings", "Where to ask first, how to buy approved plans from the authorities, and how to tell one kind of plan from another."]
   };
   window.BPMODE = mode; window.BPTAG = NAMES[mode][0]; document.documentElement.setAttribute("data-mode", mode);
   if (mode !== "bp") {
@@ -104,7 +105,21 @@
     ["#v-check .view-head .lead", "Upload the car park and street plans. Each sheet is read against the LTA rule set in this hub and every finding is reported as comply, not comply, or cannot tell from the sheet, with the clause and where it was seen."], ["#drop b", "Drop the car park and street plans here"],
     ["#v-playbook .view-head h2", "Managing an LTA submission, stage by stage"], ["#v-playbook .view-head .lead", "What to ask for, what to check and what to chase at each stage."]
   ];
-  var PLACE = { lta: "Try: parking lot, ramp gradient, railway protection zone, access point, road opening, transport impact", pub: "Try: platform level, detention tank, silt, sewer setback, inspection chamber, grease trap", scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
+  TXT.plans = [
+    ['#nav a[href="#story"]', "Why plans"], ['#nav a[href="#who"]', "Where to get them"], ['#nav a[href="#playbook"]', "Talking to the client"], ['#nav a[href="#check"]', "Check a drawing"],
+    ["#v-story .hero .label", "Why the right drawings come first"], ["#v-story .hero h1", "A layout is not a drawing."], ["#v-story .hero .lead", "We cannot quote or review from a sales brochure. This is how to help a client find the approved plans of their building, buy the right ones, and tell them apart."],
+    ["#v-story > .grid .navcard:nth-child(1) b", "Tell them apart"], ["#v-story > .grid .navcard:nth-child(1) span", "Plan types and title blocks"], ["#v-story > .grid .navcard:nth-child(2) b", "Where to get them"], ["#v-story > .grid .navcard:nth-child(2) span", "Owner, MCST, BCA, URA, HDB"], ["#v-story > .grid .navcard:nth-child(4) b", "Check a drawing"], ["#v-story > .grid .navcard:nth-child(4) span", "Is this the right one?"],
+    ["#v-guide .view-head h2", "Learn to tell one drawing from another"], ["#v-guide .view-head .lead", "What each kind of plan looks like, what it is good for, and which ones to buy."], ["#v-guide > h3", "Twelve things to know before the client pays"],
+    ["#v-guide > .grid .navcard:nth-child(1) b", "Where to get them"], ["#v-guide > .grid .navcard:nth-child(1) span", "By type of building"], ["#v-guide > .grid .navcard:nth-child(4) b", "Check a drawing"], ["#v-guide > .grid .navcard:nth-child(4) span", "Upload what the client sent"],
+    ["#v-mistakes .view-head h2", "Why we end up with the wrong drawings"], ["#v-mistakes .view-head .lead", "Where clients and staff lose time and money. Pick a stage."],
+    ["#v-search .view-head h2", "Search the plan purchase guide"],
+    ["#v-who .view-head h2", "Where to get the drawings, by type of building"], ["#v-who .view-head .lead", "Ask for what already exists before anyone pays an authority."],
+    ["#v-process .view-head h2", "From the first call to the right drawings in hand"], ["#v-process .view-head .lead", "The sequence: what to ask, where to look, how to buy, and how to check what arrives."],
+    ["#v-fees .view-head .lead", "What the authorities charge for searches and copies. A measured survey or a structural investigation is a commercial cost outside this estimate."],
+    ["#v-check .view-head h2", "Is this the right drawing?"], ["#v-check .view-head .lead", "Upload what the client sent. Each sheet is checked for what kind of drawing it is, whether it is an approved plan, and whether we can quote or review from it."], ["#drop b", "Drop what the client sent"],
+    ["#v-playbook .view-head h2", "Talking a client through it, stage by stage"], ["#v-playbook .view-head .lead", "What to ask, what to check and what to chase."]
+  ];
+  var PLACE = { plans: "Try: structural plan, as-built, MCST, search fee, letter of authorisation, title block", lta: "Try: parking lot, ramp gradient, railway protection zone, access point, road opening, transport impact", pub: "Try: platform level, detention tank, silt, sewer setback, inspection chamber, grease trap", scdf: "Try: travel distance, exit staircase, rising main, minor A&A, registered inspector, fire safety certificate", st: "Try: accredited checker, borehole, pile load test, deflection, site supervisor, amendment", ura: "Try: plot ratio, GFA, setback, plan lodgment, change of use, land betterment charge" };
   if (TXT[mode]) {
     TXT[mode].forEach(function (t) { var el = document.querySelector(t[0]); if (el) el.textContent = t[1]; });
     var qi = document.querySelector("#q"); if (qi) qi.placeholder = PLACE[mode];

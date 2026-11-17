@@ -5,10 +5,18 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", WATER = window.BPMODE === "pub", ROAD = window.BPMODE === "lta", TAG = window.BPTAG || "BP";
-  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : window.BPMODE === "pub" ? ["PUB clearance outlook", "TOP / CSC outlook"] : window.BPMODE === "lta" ? ["LTA clearance outlook", "TOP / CSC outlook"] : ["Plan approval outlook", "TOP / CSC outlook"];
-  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)", pub: "Drainage, sewerage and water (PUB)", lta: "Streets, parking and railway protection (LTA)" }[window.BPMODE || "bp"];
+  var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", WATER = window.BPMODE === "pub", ROAD = window.BPMODE === "lta", PLANS = window.BPMODE === "plans", TAG = window.BPTAG || "BP";
+  var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : window.BPMODE === "pub" ? ["PUB clearance outlook", "TOP / CSC outlook"] : window.BPMODE === "lta" ? ["LTA clearance outlook", "TOP / CSC outlook"] : window.BPMODE === "plans" ? ["Can we quote from these?", "Can we review from these?"] : ["Plan approval outlook", "TOP / CSC outlook"];
+  var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)", pub: "Drainage, sewerage and water (PUB)", lta: "Streets, parking and railway protection (LTA)", plans: "As-built drawings" }[window.BPMODE || "bp"];
   function mt(s) {
+    if (PLANS) return String(s).replace(/You are screening one sheet of a Singapore building plan \(BP\) drawing set for a civil and structural engineering firm\. This is a first-pass technical screen, not a statutory approval\./g, "You are looking at one sheet a client has sent to a Singapore civil and structural engineering firm. The firm needs to know what kind of drawing it is, whether it is an authority-approved or as-built plan, and whether an engineer could quote or review structural works from it.")
+      .replace(/building plan \(BP\) and architectural submissions/g, "obtaining the existing approved and as-built drawings of a building in Singapore").replace(/building plan \(BP\)/g, "existing building drawing")
+      .replace(/building plan drawing set/g, "set of drawings a client has sent").replace(/for BP\/plan approval and for TOP\/CSC/g, "for whether the firm can quote from these drawings (first) and whether it can do a structural review from them (second)")
+      .replace(/\\"likely to clear\\", \\"likely to draw queries\\", \\"likely to be rejected or need redesign\\", \\"cannot assess\\"/g, '\\"yes\\", \\"partly, more drawings needed\\", \\"no, these are the wrong drawings\\", \\"cannot assess\\"')
+      .replace(/"likely to clear", "likely to draw queries", "likely to be rejected or need redesign", "cannot assess"/g, '"yes", "partly, more drawings needed", "no, these are the wrong drawings", "cannot assess"')
+      .replace(/a BP submission needs/g, "an engineer needs in order to quote and review").replace(/standard BP sheet contents/g, "standard approved-plan contents")
+      .replace(/the specific things most likely to draw a written direction or delay clearance, most serious first, each with the agency/g, "the specific gaps that stop the firm quoting or reviewing, most serious first, each with the authority or person who holds the missing drawing")
+      .replace(/who manage the architect/g, "who deal with the client").replace(/send the architect/g, "send the client").replace(/Send to the architect/g, "Ask the client for").replace(/Ask the architect/g, "Ask the client").replace(/\bBP\b/g, "drawing");
     if (ROAD) return String(s).replace(/building plan \(BP\) and architectural submissions/g, "LTA street works, parking and railway protection submissions").replace(/building plan \(BP\)/g, "LTA submission")
       .replace(/building plan drawing set/g, "street works and parking drawing set").replace(/BP\/plan approval/g, "LTA clearance")
       .replace(/a BP submission needs/g, "an LTA submission needs").replace(/standard BP sheet contents/g, "standard street works and parking plan contents").replace(/\bBP\b/g, "LTA");
@@ -513,7 +521,7 @@
   }
   var RULE = {}; D.entries.forEach(function (e) { RULE[e.id] = e; });
   var ST = { non_comply: ["bad", "Not comply"], comply: ["ok", "Comply"], unclear: ["warn", "Cannot tell"] };
-  function bandClass(b) { b = (b || "").toLowerCase(); return b.indexOf("reject") >= 0 ? "bad" : b.indexOf("quer") >= 0 ? "warn" : b.indexOf("clear") >= 0 ? "ok" : ""; }
+  function bandClass(b) { b = (b || "").toLowerCase(); if (/^yes/.test(b)) return "ok"; if (/^partly/.test(b)) return "warn"; if (/^no\b/.test(b)) return "bad"; return b.indexOf("reject") >= 0 ? "bad" : b.indexOf("quer") >= 0 ? "warn" : b.indexOf("clear") >= 0 ? "ok" : ""; }
   function renderReport(rv) {
     var rep = rv.report, f = rep.findings, n = { non_comply: 0, comply: 0, unclear: 0 };
     f.forEach(function (x) { if (n[x.status] != null) n[x.status]++; });

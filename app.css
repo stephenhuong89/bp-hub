@@ -538,3 +538,17 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 [data-mode="lta"] .scdf-only, [data-mode="lta"] .pub-only, [data-mode="pub"] .scdf-only, [data-mode="scdf"] .pub-only { display: none !important; }
 .modesw button { padding: 8px 5px; font-size: .84rem; }
 .dwg .bay { fill: var(--sheet); stroke: var(--ink); stroke-width: 1.5; } .dwg .car { fill: var(--line-2); stroke: var(--ink-3); stroke-width: 1; } .dwg .rail { fill: var(--ink); } .dwg .zone.warn { fill: #F6E3B4; }
+
+/* PLANS mode: getting the as-built drawings */
+[data-mode="plans"] .bp-only, [data-mode="plans"] .st-only, [data-mode="plans"] .ura-only, html:not([data-mode="plans"]) .plans-only { display: none !important; }
+.modesw button { padding: 8px 4px; font-size: .8rem; }
+.ptypes { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.ptype { border: 2px solid var(--ink); background: var(--sheet); padding: 0; cursor: pointer; text-align: left; font: inherit; color: var(--ink); display: flex; flex-direction: column; } .ptype svg { display: block; width: 100%; height: auto; background: #fff; border-bottom: 2px solid var(--ink); }
+.ptype b { font: 700 1.15rem/1.1 var(--f-head); text-transform: uppercase; padding: 8px 10px 2px; } .ptype span { font-size: .82rem; padding: 0 10px 10px; color: var(--ink-2); }
+.ptype.on { border-color: var(--bad); box-shadow: 0 0 0 3px var(--bad); } .ptype .tag { align-self: flex-start; margin: 0 10px 10px; }
+.pd .l { stroke: var(--ink); stroke-width: 1.5; fill: none; } .pd .l2 { stroke: var(--ink-3); stroke-width: 1; fill: none; } .pd .f { fill: var(--line-2); stroke: var(--ink); stroke-width: 1; } .pd .r { fill: var(--bad); } .pd .tx { font: 6px var(--f-mono); fill: var(--ink-2); } .pd .pink { fill: #F6C6CF; } .pd .blue { fill: #BFD9EC; } .pd .grn { fill: var(--ok-soft); }
+.tb .hot { fill: transparent; stroke: var(--bad); stroke-width: 2; stroke-dasharray: 5 4; cursor: pointer; } .tb .hot:hover, .tb .hot.on { fill: rgba(200, 16, 46, .14); stroke-dasharray: none; }
+.picklist { border: 2px solid var(--ink); background: var(--sheet); } .pickrow { display: grid; grid-template-columns: 34px minmax(0, 1.4fr) minmax(0, 2.4fr) 70px 60px; gap: 6px 12px; padding: 9px 12px; border-bottom: 1px solid var(--line); align-items: center; font-size: .9rem; cursor: pointer; }
+.pickrow.head { font: 600 .72rem var(--f-mono); text-transform: uppercase; color: var(--ink-3); cursor: default; background: var(--mute-soft); } .pickrow input { width: 18px; height: 18px; } .pickrow.good { background: var(--ok-soft); } .pickrow.badpick { background: #F4C9CB; } .pickrow small { grid-column: 2 / -1; color: var(--ink-2); }
+@media (max-width: 700px) { .pickrow { grid-template-columns: 30px 1fr; } .pickrow > :nth-child(n+3) { grid-column: 2; } }
+.askflow { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); } .askflow div { border: 2px solid var(--ink); border-top: 8px solid var(--bad); background: var(--sheet); padding: 12px; display: flex; flex-direction: column; gap: 4px; } .askflow b { font: 700 1.2rem/1.1 var(--f-head); text-transform: uppercase; } .askflow span { font-size: .9rem; } .askflow small { color: var(--ink-3); font-family: var(--f-mono); font-size: .72rem; }
