@@ -111,6 +111,7 @@
         opt("water", "Water service installation", "Licensed plumber or PE", "pe", "Notification", "The installation is notified to PUB before work.", "12 working days from a licensed plumber, 21 from a PE.", "PUB, Service commitment", S.svc, "water supply meter")
       ]
     },
+    lanes: ["Project team", "PUB"],
     tracks: [{ id: "bld", label: "New building" }, { id: "earth", label: "Earthworks, 0.2 ha or more" }, { id: "near", label: "Works near a sewer or water pipe" }, { id: "food", label: "Food outlet or industry" }],
     steps: [
       { id: "w-find", col: 0, lanes: [0, 0], untimed: true, title: "Find what is in the ground", tracks: ["bld", "earth", "near", "food"], agency: "Developer", lead: "QP", status: "verified",

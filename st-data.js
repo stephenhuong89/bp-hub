@@ -61,6 +61,7 @@
       ]
     },
 
+    lanes: ["Project team", "BCA"],
     tracks: [{ id: "new", label: "New building with piling" }, { id: "aa", label: "A&A to an existing building" }, { id: "landed", label: "Landed house" }, { id: "gbw", label: "Deep excavation" }],
     steps: [
       { id: "s-appoint", col: 0, lanes: [0, 0], untimed: true, title: "Appointments", tracks: ["new", "aa", "landed", "gbw"], agency: "Developer", lead: "Developer, with CVC advising", status: V,

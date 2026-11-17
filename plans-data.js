@@ -80,12 +80,29 @@
 
   function opt(id, label, qp, verdict, vlabel, basis, detail, ref, src, tags, conf) { return { id: id, label: label, qp: qp, verdict: verdict, vlabel: vlabel, confidence: conf || "High", basis: basis, detail: detail, ref: ref, src: src, tags: tags }; }
 
+  var LINKS = '<div class="panel"><h3>Links to buy the plans</h3><div class="linkgrid">' +
+    [["BCA", "Plan Purchase: start here", "Fees, steps and the two buttons below.", "https://bca.gov.sg/pps"],
+     ["BCA", "Submit a new application", "The online form. Log in with Singpass. S$45 an address.", "https://go.gov.sg/bcapps"],
+     ["BCA", "View and download the plans", "The portal BCA opens to you after its reply. Choose the sets here, S$65 each.", "https://www.bca.gov.sg/singpassauthen/encrypt_Portal_Mbr.aspx?ID=FD3162C9-8476-43B6-B05D-053FE177902A"],
+     ["BCA", "Who may apply and what to attach", "Read this before applying. It lists the four kinds of applicant.", "https://www.bca.gov.sg/pps/Doc/Eligibility%20and%20Supporting%20Documents%20Required.pdf"],
+     ["BCA form", "Authorisation form: private owner", "Type 1. The owner signs it so someone else may apply.", "https://www.bca.gov.sg/pps/Doc/Authorisation%20Type%201.pdf"],
+     ["BCA form", "Authorisation form: company owner", "Type 2. On the company's letterhead, signed by an authorised signatory.", "https://www.bca.gov.sg/pps/Doc/Authorisation%20Type%202.pdf"],
+     ["BCA form", "Authorisation form: management corporation", "Type 3. Signed by the chairman.", "https://www.bca.gov.sg/pps/Doc/Authorisation%20Type%203.pdf"],
+     ["URA", "Buy planning records: how it works", "Planning plans only: approved use, layout and floor area. S$109 to search.", "https://www.ura.gov.sg/eservices-info/development-control/buy-dc-planning-records-help/"],
+     ["URA", "Buy planning records: questions and fees", "What you can buy, who may buy and the charges.", "https://www.ura.gov.sg/eservices-info/development-control/buy-dc-planning-records-faq/"],
+     ["JTC", "Request for building plans", "For JTC buildings. Reply in 3 working days, fee waived online.", "https://www.jtc.gov.sg/get-help/development-and-renovation-works/request-for-building-plans"],
+     ["SLA", "INLIS", "Lot numbers, survey plans, and PUB and LTA service plans.", "https://app.sla.gov.sg/inlis/"],
+     ["SCDF", "Form to inspect or copy fire safety records", "Where the works affect exits or compartments.", "https://www.scdf.gov.sg/docs/default-source/scdf-library/directory-of-fire-safety-services/forms/search-plan-form.pdf"],
+     ["NAS", "National Archives: building plans", "Plans from 1884 to 1969. Apply to BCA first.", "https://www.nas.gov.sg/archivesonline/maps_building_plans/faq"]
+    ].map(function (l) { return '<a class="linkcard" href="' + l[3] + '" target="_blank" rel="noopener"><small>' + l[0] + "</small><b>" + l[1] + "</b><span>" + l[2] + "</span></a>"; }).join("") +
+    '</div><p class="small">Checked on 17 Nov 2026. For an HDB unit the authorisation must be signed by HDB; BCA\'s eligibility document gives the contact. If a link has moved, start from BCA\'s Plan Purchase page.</p></div>';
+  window.PLANSLINKS = LINKS;
   window.PLANSDATA = {
     meta: { asOf: "17 Nov 2026", setName: "getting the as-built drawings", note: "Internal training guide for CVC Engineers. Fees and processes change; confirm them on the authority's page before telling a client. Purchased plans show what was approved and may differ from the building today." },
     synonyms: { asbuilt: ["as-built", "as built", "record plan", "existing drawings"], st: ["structural plan", "structural drawing"], bp: ["building plan", "architectural plan", "archi plan"], loa: ["letter of authorisation", "authorisation form"], mcst: ["management corporation", "managing agent"], pps: ["plan purchase"], wp: ["written permission"], hdb: ["flat"] },
     who: {
       buckets: [["pe", "Ask first: free", "People who may already hold the drawings"], ["either", "Buy from the authority", "A search fee, then a fee for each set"], ["architect", "Nothing on record", "Measure and investigate"]],
-      headlineHtml: '<div class="note bad"><b>We cannot quote or review from a layout.</b> Before anyone pays an authority, find out what the works are and who may already hold the drawings.</div><div class="panel"><h3>The order to try</h3><div class="prose"><ol><li><b>Ask who already has them.</b> The seller, the management corporation, the original architect or engineer, or the developer. This costs nothing.</li><li><b>Buy the approved plans.</b> BCA holds the building plans and structural plans. URA holds planning plans only. HDB and JTC hold plans for their own buildings.</li><li><b>If nothing exists, measure and investigate.</b> A surveyor measures the building and we investigate the structure.</li></ol></div></div>',
+      headlineHtml: '<div class="note bad"><b>We cannot quote or review from a layout.</b> Before anyone pays an authority, find out what the works are and who may already hold the drawings.</div><div class="panel"><h3>The order to try</h3><div class="prose"><ol><li><b>Ask who already has them.</b> The seller, the management corporation, the original architect or engineer, or the developer. This costs nothing.</li><li><b>Buy the approved plans.</b> BCA holds the building plans and structural plans. URA holds planning plans only. HDB and JTC hold plans for their own buildings.</li><li><b>If nothing exists, measure and investigate.</b> A surveyor measures the building and we investigate the structure.</li></ol></div></div>' + LINKS,
       notesHtml: '<h3>BCA or URA?</h3><ul><li><b>BCA</b> holds the approved <b>building plans</b>, which are the architect\'s, and the approved <b>structural plans</b>, which are the engineer\'s. For our work, this is where to go.</li><li><b>URA</b> holds the <b>planning plans</b> from the written permission. They prove the approved use and floor area. They do not show structure, and the search costs more.</li><li>Both need the owner: either the owner applies, or the owner signs an authorisation form.</li></ul>',
       options: [
         opt("seller", "The seller or previous owner", "Client asks", "pe", "Ask first", "Owners are often handed a set of plans at purchase or after renovation.", "Ask the client's conveyancing lawyer too.", CVC, "", "resale handover", "Medium"),
@@ -104,6 +121,7 @@
         opt("none", "Nothing can be found", "Registered surveyor and CVC", "architect", "Survey and investigate", "A surveyor measures the building. We then find the structure by scanning for reinforcement, coring and trial pits.", "Quote this as a separate first stage, before the design fee.", CVC, "", "no records measured survey", "Medium")
       ]
     },
+    lanes: ["Our side", "BCA", "URA"],
     tracks: [{ id: "priv", label: "Private house or shophouse" }, { id: "strata", label: "Condo or strata unit" }, { id: "hdb", label: "HDB" }, { id: "ind", label: "Factory or commercial" }],
     steps: [
       { id: "g-ask", col: 0, lanes: [0, 0], untimed: true, title: "Ask what the works are", tracks: ["priv", "strata", "hdb", "ind"], agency: "CVC", lead: "Whoever takes the call", status: "practice",
@@ -140,7 +158,7 @@
         what: ["A measured survey of the building.", "Scanning for reinforcement, coring for concrete strength, and trial pits at the foundations."], out: ["Our own record drawings of the structure."], hurdles: ["The client expecting a design fee quote before this stage is done."],
         ask: ["Will the client pay for an investigation stage first?"], ref: CVC, src: "" }
     ],
-    processNotesHtml: '<h3>How to read the times</h3><ul><li>BCA and URA each allow themselves 10 working days. Tell the client two to three weeks from application to drawings in hand.</li><li>The free sources can be faster or far slower. Put a one-week limit on them.</li><li>JTC replies in 3 working days, which makes it the quickest authority.</li></ul>',
+    processNotesHtml: '<h3>How to read the times</h3><ul><li>BCA and URA each allow themselves 10 working days. Tell the client two to three weeks from application to drawings in hand.</li><li>The free sources can be faster or far slower. Put a one-week limit on them.</li><li>JTC replies in 3 working days, which makes it the quickest authority.</li></ul>' + LINKS,
     fees: {
       fields: [
         { id: "addr", label: "Addresses to search at BCA", type: "number", def: 1 },

@@ -89,17 +89,20 @@
 
   /* ---------- Process map ---------- */
   var COL = { classify: 0, appoint: 0, preconsult: 1, ura: 2, "ura-lodge": 2, dc: 2, dg: 2, pg: 3, bp: 3, st: 3, scdf: 3, cg: 4, permit: 5, build: 6, fsc: 7, top: 8, csc: 9 };
-  var LANES = ["Project team", "URA", "BCA", "SCDF", "Other agencies"];
+  var LANES0 = ["Project team", "URA", "BCA", "SCDF", "Other agencies"];
   function lanesOf(s) { if (s.id === "dg") return [1, 4]; if (s.id === "cg") return [1, 4]; if (s.id === "top" || s.id === "csc") return [2, 4]; if (/^(All)$/.test(s.agency)) return [0, 0]; if (/URA/.test(s.agency)) return [1, 1]; if (/SCDF/.test(s.agency)) return [3, 3]; if (/LTA|NEA|PUB/.test(s.agency) && !/BCA/.test(s.agency)) return [4, 4]; return [2, 2]; }
+  function laneFor(s) { if (!D.lanes) return s.lanes || lanesOf(s); for (var i = 1; i < D.lanes.length; i++) if (String(s.agency || "").indexOf(D.lanes[i]) >= 0) return [i, i]; return [0, 0]; }
   function processMap(track) {
+    var LANES = D.lanes || LANES0;
     var steps = D.steps.filter(function (s) { return s.tracks.indexOf(track) >= 0; });
+    if (!steps.length) { $("#p-map").innerHTML = ""; return; }
     var cols = []; var colOf = function (s) { return s.col != null ? s.col : COL[s.id]; };
     steps.forEach(function (s) { if (cols.indexOf(colOf(s)) < 0) cols.push(colOf(s)); }); cols.sort(function (a, b) { return a - b; });
     var cw = 118, lh = 54, x0 = 96, y0 = 28, W = x0 + cols.length * cw + 8, Hh = y0 + LANES.length * lh + 8, used = {};
     var svg = '<svg viewBox="0 0 ' + W + " " + Hh + '" class="dwg pmap" style="min-width:' + Math.min(W, 900) + 'px" role="img" aria-label="Map of the submission steps by authority">';
     LANES.forEach(function (l, i) { svg += '<rect x="0" y="' + (y0 + i * lh) + '" width="' + W + '" height="' + lh + '" class="lane' + (i % 2 ? " alt" : "") + '"/><text x="6" y="' + (y0 + i * lh + lh / 2 + 4) + '" class="t">' + l.split(" ").slice(0, 2).join(" ") + (l.split(" ").length > 2 ? "…" : "") + "</text>"; });
     steps.forEach(function (s, n) {
-      var ci = cols.indexOf(colOf(s)), ln = s.lanes || lanesOf(s), key = ci + ":" + ln[0], off = used[key] || 0; used[key] = off + 1;
+      var ci = cols.indexOf(colOf(s)), ln = laneFor(s), key = ci + ":" + ln[0], off = used[key] || 0; used[key] = off + 1;
       var x = x0 + ci * cw + 4, y = y0 + ln[0] * lh + 5 + off * 0, h = (ln[1] - ln[0] + 1) * lh - 10, w = cw - 8;
       if (off && ln[0] === ln[1]) { h = lh / 2 - 4; y += lh / 2 - 3; }
       var words = s.title.replace(/ and .*$| for the .*$| \(.*$/, "").split(" "), l1 = "", l2 = "";

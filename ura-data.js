@@ -123,6 +123,7 @@
         opt("stay", "Letting a private home for less than 3 months, or to more than 6 unrelated people", "Not applicable", "architect", "Not allowed without permission", "URA enforces a minimum stay of three consecutive months and a limit of six unrelated occupants for private homes.", "Fines of up to S$200,000 a charge have been imposed.", "URA media releases, 2024 and 2025", S.sta, "airbnb dormitory short-term")
       ]
     },
+    lanes: ["Project team", "URA", "SLA", "Minister"],
     tracks: [{ id: "new", label: "New development, full application" }, { id: "lodge", label: "Landed house by lodgment" }, { id: "cou", label: "Change of use" }, { id: "outline", label: "Outline application first" }],
     steps: [
       { id: "u-site", col: 0, lanes: [0, 0], untimed: true, title: "Site check", tracks: ["new", "lodge", "cou", "outline"], agency: "Developer", lead: "Developer, with the QP", status: "verified",

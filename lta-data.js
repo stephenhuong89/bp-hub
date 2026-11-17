@@ -121,6 +121,7 @@
         opt("open", "Digging up or occupying a public road or footpath", "Registered contractor", "either", "LTA.PROMPT permit", "Any works on a public street need LTA's approval.", "No opening for 1 year after resurfacing, 2 years after a new road.", WPS, S.wps, "road opening utility connection")
       ]
     },
+    lanes: ["Project team", "LTA"],
     tracks: [{ id: "bld", label: "New development" }, { id: "rail", label: "Site within 40 m of a railway" }, { id: "road", label: "Works on a public street" }],
     steps: [
       { id: "t-site", col: 0, lanes: [0, 0], untimed: true, title: "Check the road and what runs nearby", tracks: ["bld", "rail", "road"], agency: "Developer", lead: "QP", status: "verified",

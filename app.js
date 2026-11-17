@@ -4,7 +4,7 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  function store(k, v) { if (window.BPMODE && window.BPMODE !== "bp") k += "." + window.BPMODE; try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
   var ST = window.BPMODE === "st", URA = window.BPMODE === "ura", FIRE = window.BPMODE === "scdf", WATER = window.BPMODE === "pub", ROAD = window.BPMODE === "lta", PLANS = window.BPMODE === "plans", TAG = window.BPTAG || "BP";
   var OUTLOOK = window.BPMODE === "ura" ? ["Written permission outlook", "Building plan stage outlook"] : window.BPMODE === "scdf" ? ["Fire safety plan approval outlook", "Fire Safety Certificate outlook"] : window.BPMODE === "pub" ? ["PUB clearance outlook", "TOP / CSC outlook"] : window.BPMODE === "lta" ? ["LTA clearance outlook", "TOP / CSC outlook"] : window.BPMODE === "plans" ? ["Can we quote from these?", "Can we review from these?"] : ["Plan approval outlook", "TOP / CSC outlook"];
   var BRAND = { bp: "Building plan (BP)", st: "Structural plan (ST)", ura: "Planning permission (URA)", scdf: "Fire safety (SCDF)", pub: "Drainage, sewerage and water (PUB)", lta: "Streets, parking and railway protection (LTA)", plans: "As-built drawings" }[window.BPMODE || "bp"];
@@ -33,7 +33,7 @@
   }
   function money(n) { return "S$" + Number(n).toLocaleString("en-SG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function srcLink(src, text) { return src ? '<a href="' + esc(src) + '" target="_blank" rel="noopener">' + esc(text || "Source") + "</a>" : ""; }
-  function statusBadge(st) { return st === "verified" ? '<span class="badge ok">Verified</span>' : st === "web" ? '<span class="badge acc" title="Read from the official web page; spot-check table values">Official page</span>' : '<span class="badge warn">Unverified</span>'; }
+  function statusBadge(st) { return st === "practice" ? '<span class="badge">CVC practice</span>' : st === "verified" ? '<span class="badge ok">Verified</span>' : st === "web" ? '<span class="badge acc" title="Read from the official web page; spot-check table values">Official page</span>' : '<span class="badge warn">Unverified</span>'; }
   function list(a) { return a && a.length ? "<ul>" + a.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : '<p class="small">None recorded.</p>'; }
 
   /* ---------- index: every entry in one searchable list ---------- */
@@ -218,7 +218,7 @@
   }
 
   /* ---------- PROCESS ---------- */
-  var track = store("bp.track") || D.tracks[0].id;
+  var track = store("bp.track"); if (!D.tracks.some(function (t) { return t.id === track; })) track = D.tracks[0].id;
   function renderProcess() {
     var el = $("#track-chips");
     el.innerHTML = D.tracks.map(function (t) { return '<button type="button" class="chip" data-v="' + t.id + '" aria-pressed="' + (t.id === track) + '">' + esc(t.label) + "</button>"; }).join("");

@@ -74,6 +74,7 @@
         opt("fsc", "Completed works, before anyone moves in", "Registered Inspectors engaged by the owner", "either", "RI, then FSC or TFP", "The RI inspects and certifies on Form 1 or Form 2, and the QP applies for the certificate or permit.", "No fee. SCDF may pick the application for its own inspection.", "SCDF, FSC and TFP", S.fsc, "completion top occupation")
       ]
     },
+    lanes: ["Project team", "SCDF"],
     tracks: [{ id: "new", label: "New building or A&A" }, { id: "maa", label: "Minor A&A" }, { id: "waiver", label: "With a waiver" }, { id: "pb", label: "Performance-based" }],
     steps: [
       { id: "f-scope", col: 0, lanes: [0, 0], untimed: true, title: "Work out the route", tracks: ["new", "maa", "waiver", "pb"], agency: "Owner", lead: "QP", status: "verified",

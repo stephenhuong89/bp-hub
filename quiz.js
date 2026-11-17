@@ -43,7 +43,7 @@
 
   function neutral(s) { return s.replace(/var\(--(ok|bad)\)/g, "var(--ink)").replace(/var\(--bad-soft\)/g, "transparent").replace(/<text[^>]*>(all equal|one taller|not on ST plan)<\/text>/g, ""); }
   var TOPICS = ["Mixed"].concat(Q.map(function (x) { return x[0]; }).filter(function (t, i, a) { return a.indexOf(t) === i; })), topic = "Mixed", set = [], i = 0, score = 0, streak = 0, answered = false, wrong = {};
-  function best() { try { return JSON.parse(localStorage.getItem("bp.quiz") || "{}"); } catch (e) { return {}; } }
+  function best() { try { return JSON.parse(localStorage.getItem(("bp.quiz" + (window.BPMODE && window.BPMODE !== "bp" ? "." + window.BPMODE : ""))) || "{}"); } catch (e) { return {}; } }
   function shuffle(a) { a = a.slice(); for (var k = a.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)), t = a[k]; a[k] = a[j]; a[j] = t; } return a; }
   function start(t) { topic = t; var pool = t === "Mixed" ? Q : Q.filter(function (q) { return q[0] === t; }); set = shuffle(pool).slice(0, Math.min(10, pool.length)); i = 0; score = 0; streak = 0; wrong = {}; show(); }
   function head() {
@@ -58,7 +58,7 @@
     box.innerHTML = head() + '<div class="qcard"><div class="qtop"><span class="label">' + esc(q[0]) + " · question " + (i + 1) + " of " + set.length + '</span><span class="qscore">' + score + " right" + (streak > 1 ? " · " + streak + " in a row" : "") + '</span></div><div class="qbar"><i style="width:' + (i / set.length * 100) + '%"></i></div><h2>' + esc(q[1]) + "</h2>" + opts + '<div id="qfb"></div></div>';
   }
   function finish() {
-    var pct = Math.round(score / set.length * 100), b = best(); if (b[topic] == null || pct > b[topic]) { b[topic] = pct; try { localStorage.setItem("bp.quiz", JSON.stringify(b)); } catch (e) {} }
+    var pct = Math.round(score / set.length * 100), b = best(); if (b[topic] == null || pct > b[topic]) { b[topic] = pct; try { localStorage.setItem(("bp.quiz" + (window.BPMODE && window.BPMODE !== "bp" ? "." + window.BPMODE : "")), JSON.stringify(b)); } catch (e) {} }
     var weak = Object.keys(wrong).sort(function (x, y) { return wrong[y] - wrong[x]; });
     $("#quiz").innerHTML = head() + '<div class="qcard"><span class="label">' + esc(topic) + ' · result</span><div class="qresult"><b>' + score + " / " + set.length + "</b><span>" + (pct === 100 ? "Every one right. You can check a drawing set." : pct >= 70 ? "Solid. Review the ones you missed and go again." : "Go through the Learn page, then try again.") + "</span></div>" +
       (weak.length ? '<p class="small">Missed most in: ' + esc(weak.join(", ")) + ".</p>" : "") + '<div class="row"><button type="button" class="btn" id="qagain">Another ten</button><a class="btn ghost" href="#guide">Open the Learn page</a></div></div>';

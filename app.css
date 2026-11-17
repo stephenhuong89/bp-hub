@@ -552,3 +552,10 @@ nav a[href="#check"], nav a[href="#check"]:hover, nav a[href="#check"].on, nav a
 .pickrow.head { font: 600 .72rem var(--f-mono); text-transform: uppercase; color: var(--ink-3); cursor: default; background: var(--mute-soft); } .pickrow input { width: 18px; height: 18px; } .pickrow.good { background: var(--ok-soft); } .pickrow.badpick { background: #F4C9CB; } .pickrow small { grid-column: 2 / -1; color: var(--ink-2); }
 @media (max-width: 700px) { .pickrow { grid-template-columns: 30px 1fr; } .pickrow > :nth-child(n+3) { grid-column: 2; } }
 .askflow { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); } .askflow div { border: 2px solid var(--ink); border-top: 8px solid var(--bad); background: var(--sheet); padding: 12px; display: flex; flex-direction: column; gap: 4px; } .askflow b { font: 700 1.2rem/1.1 var(--f-head); text-transform: uppercase; } .askflow span { font-size: .9rem; } .askflow small { color: var(--ink-3); font-family: var(--f-mono); font-size: .72rem; }
+
+/* fixes: plan-type tags wrap inside the card; purchase link cards */
+.ptype .tag { white-space: normal; max-width: calc(100% - 20px); line-height: 1.25; }
+.linkgrid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.linkcard { display: flex; flex-direction: column; gap: 3px; border: 2px solid var(--ink); border-left: 8px solid var(--bad); padding: 10px 12px; background: var(--sheet); color: var(--ink); text-decoration: none; }
+.linkcard:hover, .linkcard:focus-visible { background: var(--ink); color: #fff; } .linkcard:hover span, .linkcard:hover small, .linkcard:focus-visible span, .linkcard:focus-visible small { color: #D5DADE; }
+.linkcard small { font: 600 .7rem var(--f-mono); text-transform: uppercase; color: var(--bad); } .linkcard b { font: 700 1.1rem/1.15 var(--f-head); text-transform: uppercase; } .linkcard span { font-size: .86rem; color: var(--ink-2); }

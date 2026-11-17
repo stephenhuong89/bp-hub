@@ -70,7 +70,7 @@
       s += '<text x="' + (x0 - 8) + '" y="' + (y + 15) + '" class="t" text-anchor="end">' + esc(st.title.replace(/ and .*$| for the .*$| \(.*$/, "").slice(0, 44)) + '</text><rect x="' + x + '" y="' + y + '" width="' + Math.max(4, w) + '" height="18" rx="4" class="gb' + (st.tatMax ? "" : " un") + '"><title>' + esc(st.title + ": " + (st.tatNote || "no published time")) + '</title></rect><text x="' + (x + Math.max(4, w) + 6) + '" y="' + (y + 14) + '" class="t">' + (st.tatMax ? st.tatMax + " wd" : "not published") + "</text>";
     });
     el.innerHTML = s + '</svg>';
-    $("#p-gantt-note").textContent = "About " + t + " working days of authority time if every step ran once with no resubmission. Rows that start together run in parallel. Hatched bars have no published processing time.";
+    $("#p-gantt-note").textContent = !t ? "No authority on this track publishes a processing time, so no total is shown. Hatched bars have no published processing time." : "About " + t + " working days of authority time if every step ran once with no resubmission. Rows that start together run in parallel. Hatched bars have no published processing time.";
   }
   if (window.BPVIZ) { var old = window.BPVIZ.process; window.BPVIZ.process = function (tr) { old(tr); gantt(tr); }; }
 
